@@ -27,6 +27,11 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/jen20/manta-go"
+  source = "github.com/gwydirsam/manta-go"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/spf13/cobra"
 
 [[constraint]]
