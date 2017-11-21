@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gwydirsam/scrum/cmd"
+	"github.com/gwydirsam/go-scrum/cmd"
 )
 
 func main() {
