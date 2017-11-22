@@ -10,8 +10,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// RootCmd represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
 	Use:   "scrum",
 	Short: "A command to post and read scrums",
 	Long:  `scrum is used internally to post and read the daily scrum at Joyent.`,
@@ -28,8 +28,7 @@ var RootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
@@ -39,8 +38,8 @@ func init() {
 		const key = configKeyMantaURL
 		const longOpt, shortOpt = key, "U"
 		const defaultValue = "https://us-east.manta.joyent.com"
-		RootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "URL of the manta instance (default is $MANTA_URL)")
-		viper.BindPFlag(key, RootCmd.PersistentFlags().Lookup(key))
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "URL of the manta instance (default is $MANTA_URL)")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(key))
 		viper.BindEnv(key, "MANTA_URL")
 	}
 
@@ -48,28 +47,28 @@ func init() {
 		const key = configKeyMantaKeyID
 		const longOpt, shortOpt = key, ""
 		const defaultValue = ""
-		RootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "SSH key fingerprint (default is $MANTA_KEY_ID)")
-		viper.BindPFlag(key, RootCmd.PersistentFlags().Lookup(key))
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "SSH key fingerprint (default is $MANTA_KEY_ID)")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(key))
 		viper.BindEnv(key, "MANTA_KEY_ID")
 	}
 
 	{
 		const key = configKeyMantaUser
 		const longOpt, shortOpt = key, "u"
-		RootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$USER", "username to scrum as")
-		viper.BindPFlag(key, RootCmd.PersistentFlags().Lookup(key))
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$USER", "username to scrum as")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(key))
 		viper.BindEnv(key, "MANTA_USER")
 	}
 
 	{
 		const key = configKeyTomorrow
 		const longOpt, shortOpt = key, "t"
-		RootCmd.PersistentFlags().BoolP(longOpt, shortOpt, false, "Scrum for tomorrow")
-		viper.BindPFlag(key, RootCmd.PersistentFlags().Lookup(key))
+		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, false, "Scrum for tomorrow")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(key))
 	}
 }
 
-func CheckRequiredFlags(flags *pflag.FlagSet) error {
+func checkRequiredFlags(flags *pflag.FlagSet) error {
 	requiredError := false
 	flagName := ""
 

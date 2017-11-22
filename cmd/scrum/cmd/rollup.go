@@ -19,7 +19,7 @@ var rollupCmd = &cobra.Command{
 	Short: "Roll up scrums",
 	Long:  `Roll up scrum status for posting in jabber`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return CheckRequiredFlags(cmd.Flags())
+		return checkRequiredFlags(cmd.Flags())
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// setup account
@@ -72,5 +72,5 @@ var rollupCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(rollupCmd)
+	rootCmd.AddCommand(rollupCmd)
 }

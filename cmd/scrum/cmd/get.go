@@ -18,7 +18,7 @@ var getCmd = &cobra.Command{
 	Short: "Get your scrum status",
 	Long:  `Get your scrum status`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return CheckRequiredFlags(cmd.Flags())
+		return checkRequiredFlags(cmd.Flags())
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// setup account
@@ -74,6 +74,6 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(getCmd)
+	rootCmd.AddCommand(getCmd)
 	getCmd.MarkFlagRequired("user")
 }

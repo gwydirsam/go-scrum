@@ -28,7 +28,7 @@ var setCmd = &cobra.Command{
 	Short: "Set your scrum status",
 	Long:  `Set your scrum status`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return CheckRequiredFlags(cmd.Flags())
+		return checkRequiredFlags(cmd.Flags())
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -146,7 +146,7 @@ var setCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(setCmd)
+	rootCmd.AddCommand(setCmd)
 
 	setCmd.Flags().BoolVarP(&force, "force", "f", false, "Force overwrite of any present scrum")
 
