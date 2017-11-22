@@ -8,6 +8,7 @@ import (
 
 	manta "github.com/jen20/manta-go"
 	"github.com/jen20/manta-go/authentication"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -19,7 +20,7 @@ var rollupCmd = &cobra.Command{
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return CheckRequiredFlags(cmd.Flags())
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		// setup account
 		account := "swg"
 
@@ -31,7 +32,7 @@ var rollupCmd = &cobra.Command{
 		sshKeySigner, err := authentication.NewSSHAgentSigner(
 			mantaKeyId, account)
 		if err != nil {
-			log.Fatalf("NewSSHAgentSigner: %s", err)
+			return errors.Wrap(err, "unable to create new SSH agent signer")
 		}
 
 		client, err := manta.NewClient(&manta.ClientOptions{
@@ -40,7 +41,7 @@ var rollupCmd = &cobra.Command{
 			Signers:     []authentication.Signer{sshKeySigner},
 		})
 		if err != nil {
-			log.Fatalf("NewClient: %s", err)
+			return errors.Wrap(err, "unable to create a new manta client")
 		}
 
 		// setup time format string to get current date
@@ -49,16 +50,18 @@ var rollupCmd = &cobra.Command{
 			ObjectPath: "scrum/" + time.Now().Format(layout) + "/" + userName,
 		})
 		if err != nil {
-			log.Fatalf("GetObject(): %s", err)
+			return errors.Wrap(err, "unable to get manta object")
 		}
 
 		defer output.ObjectReader.Close()
 		body, err := ioutil.ReadAll(output.ObjectReader)
 		if err != nil {
-			log.Fatalf("Reading Object: %s", err)
+			return errors.Wrap(err, "unable to read manta object")
 		}
 
 		fmt.Printf("%s", string(body))
+
+		return nil
 	},
 }
 

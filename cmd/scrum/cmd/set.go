@@ -4,11 +4,13 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"strings"
 	"time"
 
 	manta "github.com/jen20/manta-go"
 	"github.com/jen20/manta-go/authentication"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -29,7 +31,8 @@ var setCmd = &cobra.Command{
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return CheckRequiredFlags(cmd.Flags())
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+
+	RunE: func(cmd *cobra.Command, args []string) error {
 		//// validate username
 		//json, err := ioutil.ReadFile("team.json")
 		//if err != nil {
@@ -49,7 +52,7 @@ var setCmd = &cobra.Command{
 		sshKeySigner, err := authentication.NewSSHAgentSigner(
 			mantaKeyId, account)
 		if err != nil {
-			log.Fatalf("NewSSHAgentSigner: %s", err)
+			return errors.Wrap(err, "unable to create a new SSH signer")
 		}
 
 		client, err := manta.NewClient(&manta.ClientOptions{
@@ -58,7 +61,7 @@ var setCmd = &cobra.Command{
 			Signers:     []authentication.Signer{sshKeySigner},
 		})
 		if err != nil {
-			log.Fatalf("NewClient: %s", err)
+			return errors.Wrap(err, "unable to create a new manta client")
 		}
 
 		// Build file string
@@ -86,9 +89,10 @@ var setCmd = &cobra.Command{
 			_, err = client.GetObject(&manta.GetObjectInput{
 				ObjectPath: scrumPath,
 			})
-			// If the date directory does not exist, create it (them)
-			if err != nil && manta.IsDirectoryDoesNotExistError(err) {
-				dirs := strings.Split(scrumDate.Format(layout), "/")
+
+			switch {
+			case err != nil && manta.IsDirectoryDoesNotExistError(err):
+				dirs := strings.Split(scrumDate.Format(scrumDateLayout), "/")
 				createDir := "scrum/"
 				for _, dir := range dirs {
 					createDir += dir + "/"
@@ -96,14 +100,17 @@ var setCmd = &cobra.Command{
 						DirectoryName: createDir,
 					})
 					if err != nil {
-						log.Fatalf("PutObject(): %s", err)
+						return errors.Wrap(err, "unable to put object")
 					}
 				}
-			} else if err != nil && !manta.IsResourceNotFoundError(err) {
-				log.Fatalf("GetObject(): %s", err)
-			} else if !force {
+			case err != nil && !manta.IsResourceNotFoundError(err):
+				return errors.Wrap(err, "unable to get object")
+			case !force:
 				// if not, we need a force flag
-				log.Fatalf("~~/stor/%s exists and -f not specified", scrumPath)
+				return errors.Wrapf(err, "~~/stor/%s exists and -f not specified", scrumPath)
+			case err == nil:
+				log.Printf("scrum for %q already exists, specify -f to override", scrumPath)
+				continue
 			}
 
 			log.Printf("scrum: scrumming for %s", scrumDate.Format(layout))
@@ -115,18 +122,21 @@ var setCmd = &cobra.Command{
 			} else if iFile != "" {
 				f, err := os.Open(iFile)
 				if err != nil {
-					log.Fatalf("os.Open: %s", err)
+					return errors.Wrap(err, "unable to open file")
 				}
 				defer f.Close()
 				reader = f
 			}
 
-			putObject(client, scrumPath, reader)
+			if err := putObject(client, scrumPath, reader); err != nil {
+				return errors.Wrap(err, "unable to put object")
+			}
 
 			// scrum for next day
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
+		return nil
 	},
 }
 
@@ -155,13 +165,15 @@ func max(a, b int) int {
 	return a
 }
 
-func putObject(client *manta.Client, scrumPath string, reader io.ReadSeeker) {
+func putObject(client *manta.Client, scrumPath string, reader io.ReadSeeker) error {
 	err := client.PutObject(&manta.PutObjectInput{
 		ObjectPath:   scrumPath,
 		ObjectReader: reader,
 	})
 	if err != nil {
-		log.Fatalf("PutObject(): %s", err)
+		return errors.Wrap(err, "unable to put object")
 	}
 	log.Printf("scrum: got it")
+
+	return nil
 }
