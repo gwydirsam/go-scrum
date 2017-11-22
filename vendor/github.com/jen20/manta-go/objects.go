@@ -38,7 +38,6 @@ func (c *Client) GetObject(input *GetObjectInput) (*GetObjectOutput, error) {
 
 	respBody, respHeaders, err := c.executeRequest(http.MethodGet, path, nil, nil, nil)
 	if err != nil {
-		respBody.Close()
 		return nil, errwrap.Wrapf("Error executing GetDirectory request: {{err}}", err)
 	}
 

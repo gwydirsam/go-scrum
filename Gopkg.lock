@@ -41,7 +41,7 @@
   branch = "logger-option"
   name = "github.com/jen20/manta-go"
   packages = [".","authentication"]
-  revision = "61443d98594e691346a292489145b0f54aa1d475"
+  revision = "e149f4bcc5c09678d6f2ea9e933eb26e0b87ae5d"
   source = "github.com/sean-/manta-go"
 
 [[projects]]
@@ -126,7 +126,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "328643532ee3c60c099171d4ce2cad0ca0354ca9"
+  revision = "82aafbf43bf885069dc71b7e7c2f9d7a614d47da"
 
 [[projects]]
   branch = "master"
