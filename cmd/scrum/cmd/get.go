@@ -41,6 +41,11 @@ var getCmd = &cobra.Command{
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
 
+		userName, err := getUser()
+		if err != nil {
+			return errors.Wrap(err, "unable to find a username")
+		}
+
 		// setup time format string to get current date
 		layout := "2006/01/02"
 		scrumDate := time.Now()

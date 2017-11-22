@@ -82,6 +82,11 @@ var setCmd = &cobra.Command{
 			endDate = endDate.AddDate(0, 0, daysToScrum)
 		}
 
+		userName, err := getUser()
+		if err != nil {
+			return errors.Wrap(err, "unable to get username")
+		}
+
 		for i := daysToScrum; i > 0; i-- {
 			scrumPath := "scrum/" + scrumDate.Format(layout) + "/" + userName
 
