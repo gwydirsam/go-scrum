@@ -24,8 +24,8 @@ var rollupCmd = &cobra.Command{
 		// setup account
 		account := "swg"
 
-		mantaURL = viper.GetString("manta_url")
-		mantaKeyId = viper.GetString("manta_key_id")
+		mantaURL := viper.GetString("manta_url")
+		mantaKeyId := viper.GetString("manta_key_id")
 		log.Printf("MANTA_URL: %s\n", mantaURL)
 		log.Printf("MANTA_KEY_ID: %s\n", mantaKeyId)
 

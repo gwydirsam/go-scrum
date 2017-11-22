@@ -23,8 +23,8 @@ var getCmd = &cobra.Command{
 		// setup account
 		account := "Joyent_Dev"
 
-		mantaURL = viper.GetString("manta_url")
-		mantaKeyId = viper.GetString("manta_key_id")
+		mantaURL := viper.GetString(configKeyMantaURL)
+		mantaKeyId := viper.GetString(configKeyMantaKeyID)
 
 		sshKeySigner, err := authentication.NewSSHAgentSigner(
 			mantaKeyId, account)
@@ -43,6 +43,12 @@ var getCmd = &cobra.Command{
 
 		// setup time format string to get current date
 		layout := "2006/01/02"
+		scrumDate := time.Now()
+		switch {
+		case viper.GetBool(configKeyTomorrow):
+			scrumDate = scrumDate.AddDate(0, 0, 1)
+		}
+
 		output, err := client.GetObject(&manta.GetObjectInput{
 			ObjectPath: "scrum/" + time.Now().Format(layout) + "/" + userName,
 		})
@@ -64,8 +70,5 @@ var getCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(getCmd)
-
-	// Required
-	getCmd.Flags().StringVarP(&userName, "user", "u", "", "username to scrum as")
 	getCmd.MarkFlagRequired("user")
 }

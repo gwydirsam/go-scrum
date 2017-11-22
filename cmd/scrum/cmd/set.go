@@ -18,7 +18,6 @@ import (
 var (
 	iFile       string
 	force       bool
-	tomorrow    bool
 	ndays       int
 	numSick     int
 	numVacation int
@@ -45,8 +44,8 @@ var setCmd = &cobra.Command{
 
 		// setup account
 		account := "Joyent_Dev"
-		mantaURL = viper.GetString("manta_url")
-		mantaKeyId = viper.GetString("manta_key_id")
+		mantaURL := viper.GetString(configKeyMantaURL)
+		mantaKeyId := viper.GetString(configKeyMantaKeyID)
 
 		// setup client
 		sshKeySigner, err := authentication.NewSSHAgentSigner(
@@ -68,9 +67,10 @@ var setCmd = &cobra.Command{
 		// setup time format string to get current date
 		layout := "2006/01/02"
 		scrumDate := time.Now()
-		if tomorrow {
+		switch {
+		case viper.GetBool(configKeyTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
-		} else if ndays != 0 {
+		case ndays != 0:
 			scrumDate = scrumDate.AddDate(0, 0, ndays)
 		}
 
@@ -144,7 +144,6 @@ func init() {
 	RootCmd.AddCommand(setCmd)
 
 	setCmd.Flags().BoolVarP(&force, "force", "f", false, "Force overwrite of any present scrum")
-	setCmd.Flags().BoolVarP(&tomorrow, "tomorrow", "t", false, "Scrum for tomorrow")
 
 	setCmd.Flags().IntVarP(&ndays, "days", "d", 0, "Scrum for n days from now")
 	setCmd.Flags().IntVarP(&numSick, "sick", "s", 0, "Sick leave for n days")
@@ -153,9 +152,7 @@ func init() {
 	setCmd.Flags().StringVarP(&iFile, "file", "i", "", "file to read scrum from")
 
 	// Required Flags
-
-	setCmd.Flags().StringVarP(&userName, "user", "u", "", "user to scrum as")
-	setCmd.MarkFlagRequired("user")
+	setCmd.MarkFlagRequired(configKeyMantaUser)
 }
 
 func max(a, b int) int {

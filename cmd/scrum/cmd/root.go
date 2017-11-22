@@ -10,10 +10,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var mantaURL string
-var mantaKeyId string
-var userName string
-
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "scrum",
@@ -39,15 +35,38 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-	RootCmd.PersistentFlags().StringVar(&mantaURL, "url", "", "URL of the manta instance (default is $MANTA_URL)")
-	viper.BindPFlag("url", RootCmd.PersistentFlags().Lookup("manta_url"))
-	RootCmd.PersistentFlags().StringVar(&mantaKeyId, "keyid", "", "SSH key fingerprint (default is $MANTA_KEY_ID)")
-	viper.BindPFlag("keyid", RootCmd.PersistentFlags().Lookup("manta_key_id"))
+	{
+		const key = configKeyMantaURL
+		const longOpt, shortOpt = key, "U"
+		const defaultValue = "https://us-east.manta.joyent.com"
+		RootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "URL of the manta instance (default is $MANTA_URL)")
+		viper.BindPFlag(key, RootCmd.PersistentFlags().Lookup(key))
+		viper.BindEnv(key, "MANTA_URL")
+	}
 
-	viper.AutomaticEnv() // read in environment variables that match
+	{
+		const key = configKeyMantaKeyID
+		const longOpt, shortOpt = key, ""
+		const defaultValue = ""
+		RootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "SSH key fingerprint (default is $MANTA_KEY_ID)")
+		viper.BindPFlag(key, RootCmd.PersistentFlags().Lookup(key))
+		viper.BindEnv(key, "MANTA_KEY_ID")
+	}
+
+	{
+		const key = configKeyMantaUser
+		const longOpt, shortOpt = key, "u"
+		RootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$USER", "username to scrum as")
+		viper.BindPFlag(key, RootCmd.PersistentFlags().Lookup(key))
+		viper.BindEnv(key, "MANTA_USER")
+	}
+
+	{
+		const key = configKeyTomorrow
+		const longOpt, shortOpt = key, "t"
+		RootCmd.PersistentFlags().BoolP(longOpt, shortOpt, false, "Scrum for tomorrow")
+		viper.BindPFlag(key, RootCmd.PersistentFlags().Lookup(key))
+	}
 }
 
 func CheckRequiredFlags(flags *pflag.FlagSet) error {
