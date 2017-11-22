@@ -14,9 +14,12 @@ import (
 )
 
 var getCmd = &cobra.Command{
-	Use:   "get",
-	Short: "Get your scrum status",
-	Long:  `Get your scrum status`,
+	Use:          "get",
+	Short:        "Get scrum information",
+	Long:         `Get scrum information, either for yourself or teammates`,
+	SilenceUsage: true,
+	Example: `  $ scrum get                      # Get my scrum for today
+  $ scrum get -t -u other.username # Get other.username's scrum for tomorrow`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return checkRequiredFlags(cmd.Flags())
 	},
@@ -25,10 +28,10 @@ var getCmd = &cobra.Command{
 		account := "Joyent_Dev"
 
 		mantaURL := viper.GetString(configKeyMantaURL)
-		mantaKeyId := viper.GetString(configKeyMantaKeyID)
+		mantaKeyID := viper.GetString(configKeyMantaKeyID)
 
 		sshKeySigner, err := authentication.NewSSHAgentSigner(
-			mantaKeyId, account)
+			mantaKeyID, account)
 		if err != nil {
 			return errors.Wrap(err, "unable to create new SSH agent signer")
 		}
@@ -37,6 +40,7 @@ var getCmd = &cobra.Command{
 			Endpoint:    mantaURL,
 			AccountName: account,
 			Signers:     []authentication.Signer{sshKeySigner},
+			Logger:      stdLogger,
 		})
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")

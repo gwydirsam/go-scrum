@@ -3,13 +3,13 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"path"
 	"time"
 
 	manta "github.com/jen20/manta-go"
 	"github.com/jen20/manta-go/authentication"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -26,12 +26,11 @@ var rollupCmd = &cobra.Command{
 		account := "swg"
 
 		mantaURL := viper.GetString("manta_url")
-		mantaKeyId := viper.GetString("manta_key_id")
-		log.Printf("MANTA_URL: %s\n", mantaURL)
-		log.Printf("MANTA_KEY_ID: %s\n", mantaKeyId)
+		mantaKeyID := viper.GetString("manta_key_id")
+		log.Debug().Str("MANTA_URL", mantaURL).Str("MANTA_KEY_ID", mantaKeyID).Msg("")
 
 		sshKeySigner, err := authentication.NewSSHAgentSigner(
-			mantaKeyId, account)
+			mantaKeyID, account)
 		if err != nil {
 			return errors.Wrap(err, "unable to create new SSH agent signer")
 		}
@@ -40,6 +39,7 @@ var rollupCmd = &cobra.Command{
 			Endpoint:    mantaURL,
 			AccountName: account,
 			Signers:     []authentication.Signer{sshKeySigner},
+			Logger:      stdLogger,
 		})
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
@@ -51,9 +51,8 @@ var rollupCmd = &cobra.Command{
 		}
 
 		// setup time format string to get current date
-		layout := "2006/01/02"
 		output, err := client.GetObject(&manta.GetObjectInput{
-			ObjectPath: path.Join("scrum", time.Now().Format(layout), userName),
+			ObjectPath: path.Join("scrum", time.Now().Format(scrumDateLayout), userName),
 		})
 		if err != nil {
 			return errors.Wrap(err, "unable to get manta object")
