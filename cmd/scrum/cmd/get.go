@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
+	"path"
 	"time"
 
 	manta "github.com/jen20/manta-go"
@@ -47,7 +48,6 @@ var getCmd = &cobra.Command{
 		}
 
 		// setup time format string to get current date
-		layout := "2006/01/02"
 		scrumDate := time.Now()
 		switch {
 		case viper.GetBool(configKeyTomorrow):
@@ -55,7 +55,7 @@ var getCmd = &cobra.Command{
 		}
 
 		output, err := client.GetObject(&manta.GetObjectInput{
-			ObjectPath: "scrum/" + time.Now().Format(layout) + "/" + userName,
+			ObjectPath: path.Join("scrum", scrumDate.Format(scrumDateLayout), userName),
 		})
 		if err != nil {
 			return errors.Wrap(err, "unable to get manta object")

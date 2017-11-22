@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"path"
 	"time"
 
 	manta "github.com/jen20/manta-go"
@@ -52,7 +53,7 @@ var rollupCmd = &cobra.Command{
 		// setup time format string to get current date
 		layout := "2006/01/02"
 		output, err := client.GetObject(&manta.GetObjectInput{
-			ObjectPath: "scrum/" + time.Now().Format(layout) + "/" + userName,
+			ObjectPath: path.Join("scrum", time.Now().Format(layout), userName),
 		})
 		if err != nil {
 			return errors.Wrap(err, "unable to get manta object")

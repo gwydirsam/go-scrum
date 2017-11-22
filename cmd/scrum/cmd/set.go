@@ -65,7 +65,6 @@ var setCmd = &cobra.Command{
 
 		// Build file string
 		// setup time format string to get current date
-		layout := "2006/01/02"
 		scrumDate := time.Now()
 		switch {
 		case viper.GetBool(configKeyTomorrow):
@@ -88,7 +87,7 @@ var setCmd = &cobra.Command{
 		}
 
 		for i := daysToScrum; i > 0; i-- {
-			scrumPath := "scrum/" + scrumDate.Format(layout) + "/" + userName
+			scrumPath := path.Join("scrum", scrumDate.Format(scrumDateLayout), userName)
 
 			// Check if scrum exists
 			_, err = client.GetObject(&manta.GetObjectInput{
@@ -98,11 +97,12 @@ var setCmd = &cobra.Command{
 			switch {
 			case err != nil && manta.IsDirectoryDoesNotExistError(err):
 				dirs := strings.Split(scrumDate.Format(scrumDateLayout), "/")
-				createDir := "scrum/"
+				scrumPath := make([]string, 0, len(dirs)+1)
+				scrumPath = append(scrumPath, "scrum")
 				for _, dir := range dirs {
-					createDir += dir + "/"
+					scrumPath = append(scrumPath, dir)
 					err = client.PutDirectory(&manta.PutDirectoryInput{
-						DirectoryName: createDir,
+						DirectoryName: path.Join(scrumPath...),
 					})
 					if err != nil {
 						return errors.Wrap(err, "unable to put object")
@@ -118,12 +118,12 @@ var setCmd = &cobra.Command{
 				continue
 			}
 
-			log.Printf("scrum: scrumming for %s", scrumDate.Format(layout))
+			log.Printf("scrum: scrumming for %s", scrumDate.Format(scrumDateLayout))
 			var reader io.ReadSeeker
 			if numSick != 0 {
-				reader = strings.NewReader("Sick leave until " + endDate.Format(layout) + "\n")
+				reader = strings.NewReader("Sick leave until " + endDate.Format(scrumDateLayout) + "\n")
 			} else if numVacation != 0 {
-				reader = strings.NewReader("Vacation until " + endDate.Format(layout) + "\n")
+				reader = strings.NewReader("Vacation until " + endDate.Format(scrumDateLayout) + "\n")
 			} else if iFile != "" {
 				f, err := os.Open(iFile)
 				if err != nil {
