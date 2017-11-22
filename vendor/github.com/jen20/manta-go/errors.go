@@ -22,127 +22,91 @@ func (e MantaError) Error() string {
 }
 
 func IsAuthSchemeError(err error) bool {
-	return isSpecificError(err, "AuthScheme")
+	return isSpecificError(err, "AuthSchemeError")
 }
+
 func IsAuthorizationError(err error) bool {
-	return isSpecificError(err, "Authorization")
+	return isSpecificError(err, "BadRequestError")
 }
-func IsBadRequestError(err error) bool {
-	return isSpecificError(err, "BadRequest")
-}
+
 func IsChecksumError(err error) bool {
-	return isSpecificError(err, "Checksum")
+	return isSpecificError(err, "ConcurrentRequestError")
 }
-func IsConcurrentRequestError(err error) bool {
-	return isSpecificError(err, "ConcurrentRequest")
-}
+
 func IsContentLengthError(err error) bool {
-	return isSpecificError(err, "ContentLength")
+	return isSpecificError(err, "ContentMD5MismatchError")
 }
-func IsContentMD5MismatchError(err error) bool {
-	return isSpecificError(err, "ContentMD5Mismatch")
-}
+
 func IsEntityExistsError(err error) bool {
-	return isSpecificError(err, "EntityExists")
+	return isSpecificError(err, "InvalidArgumentError")
 }
-func IsInvalidArgumentError(err error) bool {
-	return isSpecificError(err, "InvalidArgument")
-}
+
 func IsInvalidAuthTokenError(err error) bool {
-	return isSpecificError(err, "InvalidAuthToken")
+	return isSpecificError(err, "InvalidCredentialsError")
 }
-func IsInvalidCredentialsError(err error) bool {
-	return isSpecificError(err, "InvalidCredentials")
-}
+
 func IsInvalidDurabilityLevelError(err error) bool {
-	return isSpecificError(err, "InvalidDurabilityLevel")
+	return isSpecificError(err, "InvalidKeyIdError")
 }
-func IsInvalidKeyIdError(err error) bool {
-	return isSpecificError(err, "InvalidKeyId")
-}
+
 func IsInvalidJobError(err error) bool {
-	return isSpecificError(err, "InvalidJob")
+	return isSpecificError(err, "InvalidLinkError")
 }
-func IsInvalidLinkError(err error) bool {
-	return isSpecificError(err, "InvalidLink")
-}
+
 func IsInvalidLimitError(err error) bool {
-	return isSpecificError(err, "InvalidLimit")
+	return isSpecificError(err, "InvalidSignatureError")
 }
-func IsInvalidSignatureError(err error) bool {
-	return isSpecificError(err, "InvalidSignature")
-}
+
 func IsInvalidUpdateError(err error) bool {
-	return isSpecificError(err, "InvalidUpdate")
+	return isSpecificError(err, "DirectoryDoesNotExistError")
 }
-func IsDirectoryDoesNotExistError(err error) bool {
-	return isSpecificError(err, "DirectoryDoesNotExist")
-}
+
 func IsDirectoryExistsError(err error) bool {
-	return isSpecificError(err, "DirectoryExists")
+	return isSpecificError(err, "DirectoryNotEmptyError")
 }
-func IsDirectoryNotEmptyError(err error) bool {
-	return isSpecificError(err, "DirectoryNotEmpty")
-}
+
 func IsDirectoryOperationError(err error) bool {
-	return isSpecificError(err, "DirectoryOperation")
+	return isSpecificError(err, "InternalError")
 }
-func IsInternalError(err error) bool {
-	return isSpecificError(err, "Internal")
-}
+
 func IsJobNotFoundError(err error) bool {
-	return isSpecificError(err, "JobNotFound")
+	return isSpecificError(err, "JobStateError")
 }
-func IsJobStateError(err error) bool {
-	return isSpecificError(err, "JobState")
-}
+
 func IsKeyDoesNotExistError(err error) bool {
-	return isSpecificError(err, "KeyDoesNotExist")
+	return isSpecificError(err, "NotAcceptableError")
 }
-func IsNotAcceptableError(err error) bool {
-	return isSpecificError(err, "NotAcceptable")
-}
+
 func IsNotEnoughSpaceError(err error) bool {
-	return isSpecificError(err, "NotEnoughSpace")
+	return isSpecificError(err, "LinkNotFoundError")
 }
-func IsLinkNotFoundError(err error) bool {
-	return isSpecificError(err, "LinkNotFound")
-}
+
 func IsLinkNotObjectError(err error) bool {
-	return isSpecificError(err, "LinkNotObject")
+	return isSpecificError(err, "LinkRequiredError")
 }
-func IsLinkRequiredError(err error) bool {
-	return isSpecificError(err, "LinkRequired")
-}
+
 func IsParentNotDirectoryError(err error) bool {
-	return isSpecificError(err, "ParentNotDirectory")
+	return isSpecificError(err, "PreconditionFailedError")
 }
-func IsPreconditionFailedError(err error) bool {
-	return isSpecificError(err, "PreconditionFailed")
-}
+
 func IsPreSignedRequestError(err error) bool {
-	return isSpecificError(err, "PreSignedRequest")
+	return isSpecificError(err, "RequestEntityTooLargeError")
 }
-func IsRequestEntityTooLargeError(err error) bool {
-	return isSpecificError(err, "RequestEntityTooLarge")
-}
+
 func IsResourceNotFoundError(err error) bool {
-	return isSpecificError(err, "ResourceNotFound")
+	return isSpecificError(err, "RootDirectoryError")
 }
-func IsRootDirectoryError(err error) bool {
-	return isSpecificError(err, "RootDirectory")
-}
+
 func IsServiceUnavailableError(err error) bool {
-	return isSpecificError(err, "ServiceUnavailable")
+	return isSpecificError(err, "SSLRequiredError")
 }
-func IsSSLRequiredError(err error) bool {
-	return isSpecificError(err, "SSLRequired")
-}
+
 func IsUploadTimeoutError(err error) bool {
-	return isSpecificError(err, "UploadTimeout")
+	return isSpecificError(err, "UserDoesNotExistError")
 }
-func IsUserDoesNotExistError(err error) bool {
-	return isSpecificError(err, "UserDoesNotExist")
+
+func IsTaskInitError(err error) bool {
+	return isSpecificError(err, "UserTaskError")
 }
 
 // isSpecificError checks whether the error represented by err wraps

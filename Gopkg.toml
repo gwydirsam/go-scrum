@@ -22,9 +22,9 @@
   name = "github.com/mitchellh/go-homedir"
 
 [[constraint]]
-  branch = "master"
+  branch = "logger-option"
   name = "github.com/jen20/manta-go"
-  source = "github.com/gwydirsam/manta-go"
+  source = "github.com/sean-/manta-go"
 
 [[constraint]]
   branch = "master"
