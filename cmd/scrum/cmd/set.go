@@ -2,34 +2,31 @@ package cmd
 
 import (
 	"io"
-	"log"
 	"os"
+	"path"
 	"strings"
 	"time"
 
 	manta "github.com/jen20/manta-go"
 	"github.com/jen20/manta-go/authentication"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var (
-	iFile       string
-	force       bool
-	tomorrow    bool
-	ndays       int
-	numSick     int
-	numVacation int
-)
-
 var setCmd = &cobra.Command{
-	Use:   "set",
-	Short: "Set your scrum status",
-	Long:  `Set your scrum status`,
+	Use:          "set",
+	Short:        "Set scrum information",
+	Long:         `Set scrum information, either for yourself or teammates`,
+	SilenceUsage: true,
+	Example: `  $ scrum set -i today.md                         # Set my scrum using today.md
+  $ scrum set -t -u other.username -i tomorrow.md # Set other.username's scrum for tomorrow`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return CheckRequiredFlags(cmd.Flags())
+		return checkRequiredFlags(cmd.Flags())
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+
+	RunE: func(cmd *cobra.Command, args []string) error {
 		//// validate username
 		//json, err := ioutil.ReadFile("team.json")
 		//if err != nil {
@@ -42,33 +39,38 @@ var setCmd = &cobra.Command{
 
 		// setup account
 		account := "Joyent_Dev"
-		mantaURL = viper.GetString("manta_url")
-		mantaKeyId = viper.GetString("manta_key_id")
+		mantaURL := viper.GetString(configKeyMantaURL)
+		mantaKeyID := viper.GetString(configKeyMantaKeyID)
 
 		// setup client
 		sshKeySigner, err := authentication.NewSSHAgentSigner(
-			mantaKeyId, account)
+			mantaKeyID, account)
 		if err != nil {
-			log.Fatalf("NewSSHAgentSigner: %s", err)
+			return errors.Wrap(err, "unable to create a new SSH signer")
 		}
 
 		client, err := manta.NewClient(&manta.ClientOptions{
 			Endpoint:    mantaURL,
 			AccountName: account,
 			Signers:     []authentication.Signer{sshKeySigner},
+			Logger:      stdLogger,
 		})
 		if err != nil {
-			log.Fatalf("NewClient: %s", err)
+			return errors.Wrap(err, "unable to create a new manta client")
 		}
+
+		numDays := viper.GetInt(configKeySetNumDays)
+		numSick := viper.GetInt(configKeySetSickDays)
+		numVacation := viper.GetInt(configKeySetVacationDays)
 
 		// Build file string
 		// setup time format string to get current date
-		layout := "2006/01/02"
 		scrumDate := time.Now()
-		if tomorrow {
+		switch {
+		case viper.GetBool(configKeyTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
-		} else if ndays != 0 {
-			scrumDate = scrumDate.AddDate(0, 0, ndays)
+		case numDays != 0:
+			scrumDate = scrumDate.AddDate(0, 0, numDays)
 		}
 
 		// create end date string for vacation and sick time
@@ -79,73 +81,146 @@ var setCmd = &cobra.Command{
 			endDate = endDate.AddDate(0, 0, daysToScrum)
 		}
 
+		userName, err := getUser()
+		if err != nil {
+			return errors.Wrap(err, "unable to get username")
+		}
+
 		for i := daysToScrum; i > 0; i-- {
-			scrumPath := "scrum/" + scrumDate.Format(layout) + "/" + userName
+			scrumPath := path.Join("scrum", scrumDate.Format(scrumDateLayout), userName)
 
 			// Check if scrum exists
 			_, err = client.GetObject(&manta.GetObjectInput{
 				ObjectPath: scrumPath,
 			})
-			// If the date directory does not exist, create it (them)
-			if err != nil && manta.IsDirectoryDoesNotExistError(err) {
-				dirs := strings.Split(scrumDate.Format(layout), "/")
-				createDir := "scrum/"
+
+			switch {
+			case err != nil && manta.IsDirectoryDoesNotExistError(err):
+				dirs := strings.Split(scrumDate.Format(scrumDateLayout), "/")
+				scrumDir := make([]string, 0, len(dirs)+1)
+				scrumDir = append(scrumDir, "scrum")
 				for _, dir := range dirs {
-					createDir += dir + "/"
+					scrumDir = append(scrumDir, dir)
 					err = client.PutDirectory(&manta.PutDirectoryInput{
-						DirectoryName: createDir,
+						DirectoryName: path.Join(scrumDir...),
 					})
 					if err != nil {
-						log.Fatalf("PutObject(): %s", err)
+						return errors.Wrap(err, "unable to put object")
 					}
 				}
-			} else if err != nil && !manta.IsResourceNotFoundError(err) {
-				log.Fatalf("GetObject(): %s", err)
-			} else if !force {
+			case err != nil && !manta.IsResourceNotFoundError(err):
+				return errors.Wrap(err, "unable to get object")
+			case !viper.GetBool(configKeySetForce):
 				// if not, we need a force flag
-				log.Fatalf("~~/stor/%s exists and -f not specified", scrumPath)
+				return errors.Wrapf(err, "~~/stor/%s exists and -f not specified", scrumPath)
+			case err == nil:
+				if !viper.GetBool(configKeySetForce) {
+					log.Warn().Str("path", scrumPath).Msg("scrum already exists, specify -f to override")
+				}
+				continue
 			}
 
-			log.Printf("scrum: scrumming for %s", scrumDate.Format(layout))
 			var reader io.ReadSeeker
 			if numSick != 0 {
-				reader = strings.NewReader("Sick leave until " + endDate.Format(layout) + "\n")
+				reader = strings.NewReader("Sick leave until " + endDate.Format(scrumDateLayout) + "\n")
 			} else if numVacation != 0 {
-				reader = strings.NewReader("Vacation until " + endDate.Format(layout) + "\n")
-			} else if iFile != "" {
-				f, err := os.Open(iFile)
+				reader = strings.NewReader("Vacation until " + endDate.Format(scrumDateLayout) + "\n")
+			} else if viper.GetString(configKeySetFilename) != "" {
+				f, err := os.Open(viper.GetString(configKeySetFilename))
 				if err != nil {
-					log.Fatalf("os.Open: %s", err)
+					return errors.Wrap(err, "unable to open file")
 				}
 				defer f.Close()
 				reader = f
 			}
 
-			putObject(client, scrumPath, reader)
+			if err := putObject(client, scrumPath, reader); err != nil {
+				return errors.Wrap(err, "unable to put object")
+			}
 
 			// scrum for next day
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
+		return nil
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(setCmd)
+	rootCmd.AddCommand(setCmd)
 
-	setCmd.Flags().BoolVarP(&force, "force", "f", false, "Force overwrite of any present scrum")
-	setCmd.Flags().BoolVarP(&tomorrow, "tomorrow", "t", false, "Scrum for tomorrow")
+	{
+		const (
+			key          = configKeySetForce
+			longName     = "force"
+			shortName    = "f"
+			defaultValue = false
+			description  = "Force overwrite of any present scrum"
+		)
 
-	setCmd.Flags().IntVarP(&ndays, "days", "d", 0, "Scrum for n days from now")
-	setCmd.Flags().IntVarP(&numSick, "sick", "s", 0, "Sick leave for n days")
-	setCmd.Flags().IntVarP(&numVacation, "vacation", "v", 0, "Vacation for n days")
+		setCmd.Flags().BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
 
-	setCmd.Flags().StringVarP(&iFile, "file", "i", "", "file to read scrum from")
+	{
+		const (
+			key          = configKeySetNumDays
+			longName     = "days"
+			shortName    = "d"
+			defaultValue = 0
+			description  = "Scrum for n days from now"
+		)
+
+		setCmd.Flags().UintP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key          = configKeySetSickDays
+			longName     = "sick"
+			shortName    = "s"
+			defaultValue = 0
+			description  = "Sick leave for n days"
+		)
+
+		setCmd.Flags().UintP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key          = configKeySetVacationDays
+			longName     = "vacation"
+			shortName    = "v"
+			defaultValue = 0
+			description  = "Vacation for N days"
+		)
+
+		setCmd.Flags().UintP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key          = configKeySetFilename
+			longName     = "file"
+			shortName    = "i"
+			defaultValue = ""
+			description  = "File to read scrum from"
+		)
+
+		setCmd.Flags().StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
 
 	// Required Flags
-
-	setCmd.Flags().StringVarP(&userName, "user", "u", "", "user to scrum as")
-	setCmd.MarkFlagRequired("user")
+	setCmd.MarkFlagRequired(configKeyMantaUser)
 }
 
 func max(a, b int) int {
@@ -155,13 +230,15 @@ func max(a, b int) int {
 	return a
 }
 
-func putObject(client *manta.Client, scrumPath string, reader io.ReadSeeker) {
+func putObject(client *manta.Client, scrumPath string, reader io.ReadSeeker) error {
 	err := client.PutObject(&manta.PutObjectInput{
 		ObjectPath:   scrumPath,
 		ObjectReader: reader,
 	})
 	if err != nil {
-		log.Fatalf("PutObject(): %s", err)
+		return errors.Wrap(err, "unable to put object")
 	}
-	log.Printf("scrum: got it")
+	log.Info().Str("path", scrumPath).Msg("scrummed")
+
+	return nil
 }

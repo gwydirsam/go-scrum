@@ -38,17 +38,23 @@
   version = "v1.0"
 
 [[projects]]
-  branch = "master"
+  branch = "logger-option"
   name = "github.com/jen20/manta-go"
   packages = [".","authentication"]
-  revision = "ce71c286f12094342f4dbe815db884f8976d7501"
-  source = "github.com/gwydirsam/manta-go"
+  revision = "e149f4bcc5c09678d6f2ea9e933eb26e0b87ae5d"
+  source = "github.com/sean-/manta-go"
 
 [[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "be5ece7dd465ab0765a9682137865547526d1dfb"
   version = "v1.7.3"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
+  version = "v0.0.3"
 
 [[projects]]
   branch = "master"
@@ -61,6 +67,18 @@
   packages = ["."]
   revision = "16398bac157da96aa88f98a2df640c7f32af1da2"
   version = "v1.0.1"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/rs/zerolog"
+  packages = [".","internal/json","log"]
+  revision = "3ac71fc58dbd43122668a912b755b0979ba9ce1f"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -108,7 +126,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "328643532ee3c60c099171d4ce2cad0ca0354ca9"
+  revision = "82aafbf43bf885069dc71b7e7c2f9d7a614d47da"
 
 [[projects]]
   branch = "master"
@@ -125,6 +143,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "423e4fe307c64a78d0db404787f69ced4d3d06bea2e9ccbe2307d0b3f6ddab42"
+  inputs-digest = "3e876895a413792a1383b78e56e1ad28bf107518ec48898ff31a2df26c1d28a3"
   solver-name = "gps-cdcl"
   solver-version = 1

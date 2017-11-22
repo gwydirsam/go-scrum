@@ -32,6 +32,7 @@ type ClientOptions struct {
 	AccountName string
 	UserAgent   string
 	Signers     []authentication.Signer
+	Logger      *log.Logger
 }
 
 // NewClient is used to construct a Client in order to make API
@@ -49,9 +50,16 @@ func NewClient(options *ClientOptions) (*Client, error) {
 		CheckRedirect: doNotFollowRedirects,
 	}
 
+	var logger *log.Logger
+	if options.Logger != nil {
+		logger = options.Logger
+	} else {
+		logger = log.New(os.Stderr, "", log.LstdFlags)
+	}
+
 	retryableClient := &retryablehttp.Client{
 		HTTPClient:   httpClient,
-		Logger:       log.New(os.Stderr, "", log.LstdFlags),
+		Logger:       logger,
 		RetryWaitMin: defaultRetryWaitMin,
 		RetryWaitMax: defaultRetryWaitMax,
 		RetryMax:     defaultRetryMax,
