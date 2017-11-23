@@ -6,11 +6,13 @@ A Joyent scrum submission utility.
 
 1. Install `scrum`: `go get -v -u github.com/gwydirsam/go-scrum/cmd/scrum`
 2. Make sure `scrum` is in your path:
+
     ```
-$ export GOPATH=`go env GOPATH`
-$ export PATH=$GOPATH/bin:$PATH
-$ which scrum
-```
+    $ export GOPATH=`go env GOPATH`
+    $ export PATH=$GOPATH/bin:$PATH
+    $ which scrum
+    ```
+
 3. Initialize a config file or set environment variables.
   1. To use the `scrum` config file, use run `scrum init` to generate a default
      config file.
@@ -93,10 +95,13 @@ Global Flags:
 
 1. Install [`direnv`](https://github.com/direnv/direnv) and integrate into your
    shell.
-2. Populate a `.envrc` file:```
-export MANTA_USER=my-manta-username
-export MANTA_URL=https://us-east.manta.joyent.com
-export MANTA_KEY_ID=00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
-```
+2. Populate a `.envrc` file:
+
+    ```
+    export MANTA_USER=my-manta-username
+    export MANTA_URL=https://us-east.manta.joyent.com
+    export MANTA_KEY_ID=00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
+    ```
+
 3. `direnv allow` the directory containing the `.envrc` file.
 
