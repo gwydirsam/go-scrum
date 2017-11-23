@@ -29,6 +29,34 @@ $ ssh-keygen -E md5 -lf ~/.ssh/id_ecdsa.pub | awk '{print $2}' | cut -d : -f 2-
 
 ## Usage
 
+```
+$ scrum -h
+scrum is used internally to post and read the daily scrum at Joyent.
+
+Usage:
+  scrum [command]
+
+Available Commands:
+  get         Get scrum information
+  help        Help about any command
+  init        Generate an initial scrum configuration file
+  set         Set scrum information
+
+Flags:
+  -h, --help                   help for scrum
+  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string   Manta account name (default "Joyent_Dev")
+      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+  -t, --tomorrow               Scrum for tomorrow
+      --use-color              Use ASCII colors (default true)
+  -u, --user string            username to scrum as (default "$USER")
+
+Use "scrum [command] --help" for more information about a command.
+```
+
 ### `scrum get` Usage
 
 ```
