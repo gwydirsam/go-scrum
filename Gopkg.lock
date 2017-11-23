@@ -58,6 +58,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"
+
+[[projects]]
+  branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
   revision = "06020f85339e21b2478f756a78e295255ffa4d6a"
@@ -96,7 +102,7 @@
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "19e54c4a2b8a78c9d54b2bed61b1a6c5e1bfcf6f"
+  revision = "1be1d2841c773c01bee8289f55f7463b6e2c2539"
 
 [[projects]]
   branch = "master"
@@ -126,7 +132,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "82aafbf43bf885069dc71b7e7c2f9d7a614d47da"
+  revision = "a13efeb2fd213cf4be7227992aa54519af3b2ac0"
 
 [[projects]]
   branch = "master"
@@ -143,6 +149,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3e876895a413792a1383b78e56e1ad28bf107518ec48898ff31a2df26c1d28a3"
+  inputs-digest = "10b64fcf1f1645727048426ea6b6f0cc5fcfc39df1b2c85ab1da9714cc19a911"
   solver-name = "gps-cdcl"
   solver-version = 1
