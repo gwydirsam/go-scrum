@@ -12,9 +12,10 @@ import (
 )
 
 var rollupCmd = &cobra.Command{
-	Use:   "rollup",
-	Short: "Roll up scrums",
-	Long:  `Roll up scrum status for posting in jabber`,
+	Hidden: true, // TODO(gwydirsam): WIP
+	Use:    "rollup",
+	Short:  "Roll up scrums",
+	Long:   `Roll up scrum status for posting in jabber`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := checkRequiredFlags(cmd.Flags()); err != nil {
 			return errors.Wrap(err, "required flag missing")
