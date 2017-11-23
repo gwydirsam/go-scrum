@@ -7,7 +7,6 @@ import (
 	"time"
 
 	manta "github.com/jen20/manta-go"
-	"github.com/jen20/manta-go/authentication"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,34 +20,17 @@ var getCmd = &cobra.Command{
 	Example: `  $ scrum get                      # Get my scrum for today
   $ scrum get -t -u other.username # Get other.username's scrum for tomorrow`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return checkRequiredFlags(cmd.Flags())
-	},
-	RunE: func(cmd *cobra.Command, args []string) error {
-		// setup account
-		account := "Joyent_Dev"
-
-		mantaURL := viper.GetString(configKeyMantaURL)
-		mantaKeyID := viper.GetString(configKeyMantaKeyID)
-
-		sshKeySigner, err := authentication.NewSSHAgentSigner(
-			mantaKeyID, account)
-		if err != nil {
-			return errors.Wrap(err, "unable to create new SSH agent signer")
+		if err := checkRequiredFlags(cmd.Flags()); err != nil {
+			return errors.Wrap(err, "required flag missing")
 		}
 
-		client, err := manta.NewClient(&manta.ClientOptions{
-			Endpoint:    mantaURL,
-			AccountName: account,
-			Signers:     []authentication.Signer{sshKeySigner},
-			Logger:      stdLogger,
-		})
+		return nil
+	},
+
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getMantaClient()
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
-		}
-
-		userName, err := getUser()
-		if err != nil {
-			return errors.Wrap(err, "unable to find a username")
 		}
 
 		// setup time format string to get current date
@@ -59,7 +41,7 @@ var getCmd = &cobra.Command{
 		}
 
 		output, err := client.GetObject(&manta.GetObjectInput{
-			ObjectPath: path.Join("scrum", scrumDate.Format(scrumDateLayout), userName),
+			ObjectPath: path.Join("scrum", scrumDate.Format(scrumDateLayout), getUser()),
 		})
 		if err != nil {
 			return errors.Wrap(err, "unable to get manta object")

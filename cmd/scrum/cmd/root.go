@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	stdlog "log"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -39,22 +40,9 @@ var rootCmd = &cobra.Command{
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Perform input validation
 
-		var logLevel string
-		switch logLevel = strings.ToUpper(viper.GetString(configKeyLogLevel)); logLevel {
-		case "DEBUG":
-			zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		case "INFO":
-			zerolog.SetGlobalLevel(zerolog.InfoLevel)
-		case "WARN":
-			zerolog.SetGlobalLevel(zerolog.WarnLevel)
-		case "ERROR":
-			zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		case "FATAL":
-			zerolog.SetGlobalLevel(zerolog.FatalLevel)
-		default:
-			// FIXME(seanc@): move the supported log levels into a global constant
-			return fmt.Errorf("unsupported error level: %q (supported levels: %s)", logLevel,
-				strings.Join([]string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}, " "))
+		logLevel, err := initLogLevels()
+		if err != nil {
+			return errors.Wrap(err, "unable to initialize log levels")
 		}
 
 		// zerolog was initialized with sane defaults.  Re-initialize logging with
@@ -102,7 +90,7 @@ var rootCmd = &cobra.Command{
 			stdlog.SetFlags(0)
 			stdlog.SetOutput(zlog)
 			stdLogger = &stdlog.Logger{}
-			if logLevel != "DEBUG" {
+			if logLevel != _LogLevelDebug {
 				stdLogger.SetOutput(ioutil.Discard)
 			} else {
 				stdLogger.SetOutput(zlog)
@@ -124,11 +112,23 @@ func Execute() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	viper.SetConfigName(buildtime.PROGNAME)
+	_, _ = initLogLevels()
+
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			log.Debug().Err(err).Msg("unable to read config file")
+		} else {
+			log.Warn().Err(err).Msg("unable to read config file")
+		}
+	}
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	// Initialize viper so that when ew call initLogLevels() we can pull a value
+	// from a config file.
+	viper.SetConfigName(buildtime.PROGNAME)
+	viper.AddConfigPath(path.Join("~/", ".config", buildtime.PROGNAME))
+	viper.AddConfigPath(".")
 
 	// os.Stderr isn't guaranteed to be thread-safe, wrap in a sync writer.  Files
 	// are guaranteed to be safe, terminals are not.
@@ -137,8 +137,6 @@ func init() {
 		NoColor: true,
 	}
 	zlog := zerolog.New(zerolog.SyncWriter(w)).With().Timestamp().Logger()
-
-	cobra.OnInitialize(initConfig)
 
 	zerolog.DurationFieldUnit = time.Microsecond
 	zerolog.DurationFieldInteger = true
@@ -153,36 +151,40 @@ func init() {
 	{
 		const (
 			key          = configKeyLogLevel
-			longName     = "log-level"
-			shortName    = "l"
+			longOpt      = "log-level"
+			shortOpt     = "l"
 			defaultValue = "INFO"
 			description  = "Change the log level being sent to stdout"
 		)
 
-		rootCmd.PersistentFlags().StringP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longName))
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
+
+		// Initialize the log levels immediately.  initLogLevels() will be called
+		// again later during the standard initialization procedure.
+		_, _ = initLogLevels()
 	}
 
 	{
 		const (
 			key         = configKeyLogFormat
-			longName    = "log-format"
-			shortName   = "F"
+			longOpt     = "log-format"
+			shortOpt    = "F"
 			description = `Specify the log format ("auto", "zerolog", or "human")`
 		)
 
 		defaultValue := _LogFormatAuto.String()
-		rootCmd.PersistentFlags().StringP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longName))
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
 	{
 		const (
 			key         = configKeyLogTermColor
-			longName    = "use-color"
-			shortName   = ""
+			longOpt     = "use-color"
+			shortOpt    = ""
 			description = "Use ASCII colors"
 		)
 
@@ -191,34 +193,43 @@ func init() {
 			defaultValue = true
 		}
 
-		rootCmd.PersistentFlags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longName))
+		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
 	{
-		const key = configKeyMantaURL
-		const longOpt, shortOpt = key, "U"
-		const defaultValue = "https://us-east.manta.joyent.com"
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "URL of the manta instance (default is $MANTA_URL)")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(key))
-		viper.BindEnv(key, "MANTA_URL")
+		const key = configKeyMantaAccount
+		const longOpt, shortOpt = "manta-account", "A"
+		const defaultValue = "Joyent_Dev"
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "Manta account name")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		viper.BindEnv(key, "MANTA_ACCOUNT")
 	}
 
 	{
 		const key = configKeyMantaKeyID
-		const longOpt, shortOpt = key, ""
+		const longOpt, shortOpt = "manta-key-id", ""
 		const defaultValue = ""
 		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "SSH key fingerprint (default is $MANTA_KEY_ID)")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(key))
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_KEY_ID")
 	}
 
 	{
+		const key = configKeyMantaURL
+		const longOpt, shortOpt = "manta-url", "E"
+		const defaultValue = "https://us-east.manta.joyent.com"
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "URL of the Manta instance (default is $MANTA_URL)")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		viper.BindEnv(key, "MANTA_URL")
+	}
+
+	{
 		const key = configKeyMantaUser
-		const longOpt, shortOpt = key, "u"
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$USER", "username to scrum as")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(key))
+		const longOpt, shortOpt = "manta-user", "U"
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$MANTA_USER", "Manta username to scrum as")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_USER")
 	}
 
@@ -226,8 +237,18 @@ func init() {
 		const key = configKeyTomorrow
 		const longOpt, shortOpt = key, "t"
 		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, false, "Scrum for tomorrow")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(key))
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 	}
+
+	{
+		const key = configKeyUsername
+		const longOpt, shortOpt = "user", "u"
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$USER", "username to scrum as")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		viper.BindEnv(key, "USER")
+	}
+
+	cobra.OnInitialize(initConfig)
 }
 
 func checkRequiredFlags(flags *pflag.FlagSet) error {
@@ -250,6 +271,10 @@ func checkRequiredFlags(flags *pflag.FlagSet) error {
 
 	if requiredError {
 		return errors.New("Required flag `" + flagName + "` has not been set")
+	}
+
+	if user := getUser(); user == "" {
+		return errors.New("unable to find a username")
 	}
 
 	return nil
@@ -293,4 +318,77 @@ func getLogFormat() (_LogFormat, error) {
 	default:
 		return _LogFormatAuto, fmt.Errorf("unsupported log format: %q", logFormat)
 	}
+}
+
+type _LogLevel int
+
+const (
+	_LogLevelBegin _LogLevel = iota - 2
+	_LogLevelDebug
+	_LogLevelInfo // Default, zero-initialized value
+	_LogLevelWarn
+	_LogLevelError
+	_LogLevelFatal
+
+	_LogLevelEnd
+)
+
+func (f _LogLevel) String() string {
+	switch f {
+	case _LogLevelDebug:
+		return "debug"
+	case _LogLevelInfo:
+		return "info"
+	case _LogLevelWarn:
+		return "warn"
+	case _LogLevelError:
+		return "error"
+	case _LogLevelFatal:
+		return "fatal"
+	default:
+		panic(fmt.Sprintf("unknown log level: %d", f))
+	}
+}
+
+func logLevels() []_LogLevel {
+	levels := make([]_LogLevel, 0, _LogLevelEnd-_LogLevelBegin)
+	for i := _LogLevelBegin + 1; i < _LogLevelEnd; i++ {
+		levels = append(levels, i)
+	}
+
+	return levels
+}
+
+func logLevelsStr() []string {
+	intLevels := logLevels()
+	levels := make([]string, 0, len(intLevels))
+	for _, lvl := range intLevels {
+		levels = append(levels, lvl.String())
+	}
+	return levels
+}
+
+func initLogLevels() (logLevel _LogLevel, err error) {
+	switch strLevel := strings.ToLower(viper.GetString(configKeyLogLevel)); strLevel {
+	case "debug":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		logLevel = _LogLevelDebug
+	case "info":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		logLevel = _LogLevelInfo
+	case "warn":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+		logLevel = _LogLevelWarn
+	case "error":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+		logLevel = _LogLevelError
+	case "fatal":
+		zerolog.SetGlobalLevel(zerolog.FatalLevel)
+		logLevel = _LogLevelFatal
+	default:
+		return _LogLevelDebug, fmt.Errorf("unsupported error level: %q (supported levels: %s)", logLevel,
+			strings.Join(logLevelsStr(), " "))
+	}
+
+	return logLevel, nil
 }

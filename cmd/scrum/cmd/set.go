@@ -8,7 +8,6 @@ import (
 	"time"
 
 	manta "github.com/jen20/manta-go"
-	"github.com/jen20/manta-go/authentication"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -23,7 +22,11 @@ var setCmd = &cobra.Command{
 	Example: `  $ scrum set -i today.md                         # Set my scrum using today.md
   $ scrum set -t -u other.username -i tomorrow.md # Set other.username's scrum for tomorrow`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return checkRequiredFlags(cmd.Flags())
+		if err := checkRequiredFlags(cmd.Flags()); err != nil {
+			return errors.Wrap(err, "required flag missing")
+		}
+
+		return nil
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -37,24 +40,7 @@ var setCmd = &cobra.Command{
 		//	log.Fatalf("Expected Engineer")
 		//}
 
-		// setup account
-		account := "Joyent_Dev"
-		mantaURL := viper.GetString(configKeyMantaURL)
-		mantaKeyID := viper.GetString(configKeyMantaKeyID)
-
-		// setup client
-		sshKeySigner, err := authentication.NewSSHAgentSigner(
-			mantaKeyID, account)
-		if err != nil {
-			return errors.Wrap(err, "unable to create a new SSH signer")
-		}
-
-		client, err := manta.NewClient(&manta.ClientOptions{
-			Endpoint:    mantaURL,
-			AccountName: account,
-			Signers:     []authentication.Signer{sshKeySigner},
-			Logger:      stdLogger,
-		})
+		client, err := getMantaClient()
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
@@ -81,13 +67,8 @@ var setCmd = &cobra.Command{
 			endDate = endDate.AddDate(0, 0, daysToScrum)
 		}
 
-		userName, err := getUser()
-		if err != nil {
-			return errors.Wrap(err, "unable to get username")
-		}
-
 		for i := daysToScrum; i > 0; i-- {
-			scrumPath := path.Join("scrum", scrumDate.Format(scrumDateLayout), userName)
+			scrumPath := path.Join("scrum", scrumDate.Format(scrumDateLayout), getUser())
 
 			// Check if scrum exists
 			_, err = client.GetObject(&manta.GetObjectInput{
