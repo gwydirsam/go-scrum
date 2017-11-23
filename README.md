@@ -5,7 +5,8 @@ A Joyent scrum submission utility.
 ## Installation
 
 1. Install `scrum`: `go get -v -u github.com/gwydirsam/go-scrum/cmd/scrum`
-2. Make sure `scrum` is in your path: ```
+2. Make sure `scrum` is in your path:
+    ```
 $ export GOPATH=`go env GOPATH`
 $ export PATH=$GOPATH/bin:$PATH
 $ which scrum
