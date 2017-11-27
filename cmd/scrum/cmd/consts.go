@@ -1,13 +1,16 @@
 package cmd
 
 const (
+	configKeyInitFilename = "init.config-file"
+
 	configKeyLogFormat    = "log.format"
 	configKeyLogLevel     = "log.level"
 	configKeyLogTermColor = "log.use-color"
 
-	configKeyMantaKeyID = "key-id"
-	configKeyMantaURL   = "url"
-	configKeyMantaUser  = "user"
+	configKeyMantaAccount = "manta.account"
+	configKeyMantaKeyID   = "manta.key-id"
+	configKeyMantaURL     = "manta.url"
+	configKeyMantaUser    = "manta.user"
 
 	configKeySetFilename     = "set.input-filename"
 	configKeySetForce        = "set.force"
@@ -16,6 +19,7 @@ const (
 	configKeySetVacationDays = "set.vacation-days"
 
 	configKeyTomorrow = "tomorrow"
+	configKeyUsername = "username"
 
 	scrumDateLayout = "2006/01/02"
 )

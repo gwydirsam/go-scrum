@@ -8,7 +8,6 @@ import (
 	"time"
 
 	manta "github.com/jen20/manta-go"
-	"github.com/jen20/manta-go/authentication"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -23,7 +22,11 @@ var setCmd = &cobra.Command{
 	Example: `  $ scrum set -i today.md                         # Set my scrum using today.md
   $ scrum set -t -u other.username -i tomorrow.md # Set other.username's scrum for tomorrow`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return checkRequiredFlags(cmd.Flags())
+		if err := checkRequiredFlags(cmd.Flags()); err != nil {
+			return errors.Wrap(err, "required flag missing")
+		}
+
+		return nil
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -37,24 +40,7 @@ var setCmd = &cobra.Command{
 		//	log.Fatalf("Expected Engineer")
 		//}
 
-		// setup account
-		account := "Joyent_Dev"
-		mantaURL := viper.GetString(configKeyMantaURL)
-		mantaKeyID := viper.GetString(configKeyMantaKeyID)
-
-		// setup client
-		sshKeySigner, err := authentication.NewSSHAgentSigner(
-			mantaKeyID, account)
-		if err != nil {
-			return errors.Wrap(err, "unable to create a new SSH signer")
-		}
-
-		client, err := manta.NewClient(&manta.ClientOptions{
-			Endpoint:    mantaURL,
-			AccountName: account,
-			Signers:     []authentication.Signer{sshKeySigner},
-			Logger:      stdLogger,
-		})
+		client, err := getMantaClient()
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
@@ -81,24 +67,24 @@ var setCmd = &cobra.Command{
 			endDate = endDate.AddDate(0, 0, daysToScrum)
 		}
 
-		userName, err := getUser()
-		if err != nil {
-			return errors.Wrap(err, "unable to get username")
-		}
-
+		var foundError bool
+	DAY_HANDLING:
 		for i := daysToScrum; i > 0; i-- {
-			scrumPath := path.Join("scrum", scrumDate.Format(scrumDateLayout), userName)
+			scrumPath := path.Join("scrum", scrumDate.Format(scrumDateLayout), getUser())
 
 			// Check if scrum exists
 			_, err = client.GetObject(&manta.GetObjectInput{
 				ObjectPath: scrumPath,
 			})
 
+		ERROR_HANDLING:
 			switch {
 			case err != nil && manta.IsDirectoryDoesNotExistError(err):
 				dirs := strings.Split(scrumDate.Format(scrumDateLayout), "/")
 				scrumDir := make([]string, 0, len(dirs)+1)
 				scrumDir = append(scrumDir, "scrum")
+
+				// Unconditionally attempt to create all directories in the path
 				for _, dir := range dirs {
 					scrumDir = append(scrumDir, dir)
 					err = client.PutDirectory(&manta.PutDirectoryInput{
@@ -109,23 +95,49 @@ var setCmd = &cobra.Command{
 					}
 				}
 			case err != nil && !manta.IsResourceNotFoundError(err):
-				return errors.Wrap(err, "unable to get object")
-			case !viper.GetBool(configKeySetForce):
-				// if not, we need a force flag
-				return errors.Wrapf(err, "~~/stor/%s exists and -f not specified", scrumPath)
+				if viper.GetBool(configKeySetForce) {
+					// If we're overriding multiple days, increase the verbosity of the
+					// log messages (vs the common case, overriding just today, in which
+					// case we just use the DEBUG level).
+					if daysToScrum > 1 {
+						log.Info().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("replacing scrum")
+					} else {
+						log.Debug().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("replacing scrum")
+					}
+
+					break ERROR_HANDLING
+				}
+
+				if daysToScrum == 1 {
+					log.Error().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("scrum exists, not replacing scrum without -f to override")
+					return errors.Wrap(err, "scrum already exists")
+				}
+
+				// Let users attempt to stamp out scrum for multiple days and skip over
+				// days that already exist.  Return an error just to let the user know
+				// that the command did run into a potential problem (i.e. don't return
+				// cleanly).
+				foundError = true
+				log.Info().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("replacing scrum")
+
+				continue DAY_HANDLING
 			case err == nil:
-				if !viper.GetBool(configKeySetForce) {
+				if viper.GetBool(configKeySetForce) {
+					log.Debug().Str("path", scrumPath).Msg("scrum already exists, overriding")
+					break ERROR_HANDLING
+				} else {
 					log.Warn().Str("path", scrumPath).Msg("scrum already exists, specify -f to override")
 				}
-				continue
+				continue DAY_HANDLING
 			}
 
 			var reader io.ReadSeeker
-			if numSick != 0 {
+			switch {
+			case numSick != 0:
 				reader = strings.NewReader("Sick leave until " + endDate.Format(scrumDateLayout) + "\n")
-			} else if numVacation != 0 {
+			case numVacation != 0:
 				reader = strings.NewReader("Vacation until " + endDate.Format(scrumDateLayout) + "\n")
-			} else if viper.GetString(configKeySetFilename) != "" {
+			case viper.GetString(configKeySetFilename) != "":
 				f, err := os.Open(viper.GetString(configKeySetFilename))
 				if err != nil {
 					return errors.Wrap(err, "unable to open file")
@@ -140,6 +152,10 @@ var setCmd = &cobra.Command{
 
 			// scrum for next day
 			scrumDate = scrumDate.AddDate(0, 0, 1)
+		}
+
+		if foundError {
+			return errors.New("error occured while running scrum")
 		}
 
 		return nil
