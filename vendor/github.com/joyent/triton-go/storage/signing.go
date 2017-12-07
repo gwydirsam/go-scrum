@@ -1,4 +1,4 @@
-package manta
+package storage
 
 import (
 	"bytes"
@@ -50,25 +50,20 @@ func (output *SignURLOutput) SignedURL(scheme string) string {
 
 // SignURL creates a time-expiring URL that can be shared with others.
 // This is useful to generate HTML links, for example.
-func (c *Client) SignURL(input *SignURLInput) (*SignURLOutput, error) {
-	hostUrl, err := url.Parse(c.endpoint)
-	if err != nil {
-		return nil, errwrap.Wrapf("Error parsing endpoint URL: {{err}}", err)
-	}
-
+func (s *StorageClient) SignURL(input *SignURLInput) (*SignURLOutput, error) {
 	output := &SignURLOutput{
-		host:       hostUrl.Host,
-		objectPath: fmt.Sprintf("%s/stor/%s", c.accountName, input.ObjectPath),
+		host:       s.Client.MantaURL.Host,
+		objectPath: fmt.Sprintf("/%s%s", s.Client.AccountName, input.ObjectPath),
 		Method:     input.Method,
-		Algorithm:  strings.ToUpper(c.authorizer[0].DefaultAlgorithm()),
+		Algorithm:  strings.ToUpper(s.Client.Authorizers[0].DefaultAlgorithm()),
 		Expires:    strconv.FormatInt(time.Now().Add(input.ValidityPeriod).Unix(), 10),
-		KeyID:      fmt.Sprintf("/%s/keys/%s", c.accountName, c.authorizer[0].KeyFingerprint()),
+		KeyID:      fmt.Sprintf("/%s/keys/%s", s.Client.AccountName, s.Client.Authorizers[0].KeyFingerprint()),
 	}
 
 	toSign := bytes.Buffer{}
 	toSign.WriteString(input.Method + "\n")
-	toSign.WriteString(hostUrl.Host + "\n")
-	toSign.WriteString(fmt.Sprintf("/%s/stor/%s\n", c.accountName, input.ObjectPath))
+	toSign.WriteString(s.Client.MantaURL.Host + "\n")
+	toSign.WriteString(fmt.Sprintf("/%s%s\n", s.Client.AccountName, input.ObjectPath))
 
 	query := &url.Values{}
 	query.Set("algorithm", output.Algorithm)
@@ -76,7 +71,7 @@ func (c *Client) SignURL(input *SignURLInput) (*SignURLOutput, error) {
 	query.Set("keyId", output.KeyID)
 	toSign.WriteString(query.Encode())
 
-	signature, _, err := c.authorizer[0].SignRaw(toSign.String())
+	signature, _, err := s.Client.Authorizers[0].SignRaw(toSign.String())
 	if err != nil {
 		return nil, errwrap.Wrapf("Error signing string: {{err}}", err)
 	}

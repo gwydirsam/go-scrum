@@ -1,6 +1,7 @@
-package manta
+package storage
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -11,7 +12,12 @@ import (
 	"time"
 
 	"github.com/hashicorp/errwrap"
+	"github.com/joyent/triton-go/client"
 )
+
+type ObjectsClient struct {
+	client *client.Client
+}
 
 // GetObjectInput represents parameters to a GetObject operation.
 type GetObjectInput struct {
@@ -33,10 +39,14 @@ type GetObjectOutput struct {
 // GetObject retrieves an object from the Manta service. If error is nil (i.e.
 // the call returns successfully), it is your responsibility to close the io.ReadCloser
 // named ObjectReader in the operation output.
-func (c *Client) GetObject(input *GetObjectInput) (*GetObjectOutput, error) {
-	path := fmt.Sprintf("/%s/stor/%s", c.accountName, input.ObjectPath)
+func (s *ObjectsClient) Get(ctx context.Context, input *GetObjectInput) (*GetObjectOutput, error) {
+	path := fmt.Sprintf("/%s%s", s.client.AccountName, input.ObjectPath)
 
-	respBody, respHeaders, err := c.executeRequest(http.MethodGet, path, nil, nil, nil)
+	reqInput := client.RequestInput{
+		Method: http.MethodGet,
+		Path:   path,
+	}
+	respBody, respHeaders, err := s.client.ExecuteRequestStorage(ctx, reqInput)
 	if err != nil {
 		return nil, errwrap.Wrapf("Error executing GetDirectory request: {{err}}", err)
 	}
@@ -75,10 +85,14 @@ type DeleteObjectInput struct {
 }
 
 // DeleteObject deletes an object.
-func (c *Client) DeleteObject(input *DeleteObjectInput) error {
-	path := fmt.Sprintf("/%s/stor/%s", c.accountName, input.ObjectPath)
+func (s *ObjectsClient) Delete(ctx context.Context, input *DeleteObjectInput) error {
+	path := fmt.Sprintf("/%s%s", s.client.AccountName, input.ObjectPath)
 
-	respBody, _, err := c.executeRequest(http.MethodDelete, path, nil, nil, nil)
+	reqInput := client.RequestInput{
+		Method: http.MethodDelete,
+		Path:   path,
+	}
+	respBody, _, err := s.client.ExecuteRequestStorage(ctx, reqInput)
 	if respBody != nil {
 		defer respBody.Close()
 	}
@@ -105,8 +119,8 @@ type PutObjectMetadataInput struct {
 // 	- Content-Length
 //	- Content-MD5
 //	- Durability-Level
-func (c *Client) PutObjectMetadata(input *PutObjectMetadataInput) error {
-	path := fmt.Sprintf("/%s/stor/%s", c.accountName, input.ObjectPath)
+func (s *ObjectsClient) PutMetadata(ctx context.Context, input *PutObjectMetadataInput) error {
+	path := fmt.Sprintf("/%s%s", s.client.AccountName, input.ObjectPath)
 	query := &url.Values{}
 	query.Set("metadata", "true")
 
@@ -116,7 +130,13 @@ func (c *Client) PutObjectMetadata(input *PutObjectMetadataInput) error {
 		headers.Set(key, value)
 	}
 
-	respBody, _, err := c.executeRequest(http.MethodPut, path, query, headers, nil)
+	reqInput := client.RequestInput{
+		Method:  http.MethodPut,
+		Path:    path,
+		Query:   query,
+		Headers: headers,
+	}
+	respBody, _, err := s.client.ExecuteRequestStorage(ctx, reqInput)
 	if respBody != nil {
 		defer respBody.Close()
 	}
@@ -140,8 +160,8 @@ type PutObjectInput struct {
 	ObjectReader     io.ReadSeeker
 }
 
-func (c *Client) PutObject(input *PutObjectInput) error {
-	path := fmt.Sprintf("/%s/stor/%s", c.accountName, input.ObjectPath)
+func (s *ObjectsClient) Put(ctx context.Context, input *PutObjectInput) error {
+	path := fmt.Sprintf("/%s%s", s.client.AccountName, input.ObjectPath)
 
 	if input.MaxContentLength != 0 && input.ContentLength != 0 {
 		return errors.New("ContentLength and MaxContentLength may not both be set to non-zero values.")
@@ -170,7 +190,13 @@ func (c *Client) PutObject(input *PutObjectInput) error {
 		headers.Set("Max-Content-Length", strconv.FormatUint(input.MaxContentLength, 10))
 	}
 
-	respBody, _, err := c.executeRequestNoEncode(http.MethodPut, path, nil, headers, input.ObjectReader)
+	reqInput := client.RequestNoEncodeInput{
+		Method:  http.MethodPut,
+		Path:    path,
+		Headers: headers,
+		Body:    input.ObjectReader,
+	}
+	respBody, _, err := s.client.ExecuteRequestNoEncode(ctx, reqInput)
 	if respBody != nil {
 		defer respBody.Close()
 	}

@@ -1,10 +1,23 @@
-package manta
+package client
 
 import (
 	"fmt"
 
 	"github.com/hashicorp/errwrap"
 )
+
+// ClientError represents an error code and message along with the status code
+// of the HTTP request which resulted in the error message.
+type ClientError struct {
+	StatusCode int
+	Code       string
+	Message    string
+}
+
+// Error implements interface Error on the TritonError type.
+func (e ClientError) Error() string {
+	return fmt.Sprintf("%s: %s", e.Code, e.Message)
+}
 
 // MantaError represents an error code and message along with
 // the status code of the HTTP request which resulted in the error
@@ -18,6 +31,21 @@ type MantaError struct {
 
 // Error implements interface Error on the MantaError type.
 func (e MantaError) Error() string {
+	return fmt.Sprintf("%s: %s", e.Code, e.Message)
+}
+
+// TritonError represents an error code and message along with
+// the status code of the HTTP request which resulted in the error
+// message. Error codes used by the Triton API are listed at
+// https://apidocs.joyent.com/cloudapi/#cloudapi-http-responses
+type TritonError struct {
+	StatusCode int
+	Code       string `json:"code"`
+	Message    string `json:"message"`
+}
+
+// Error implements interface Error on the TritonError type.
+func (e TritonError) Error() string {
 	return fmt.Sprintf("%s: %s", e.Code, e.Message)
 }
 

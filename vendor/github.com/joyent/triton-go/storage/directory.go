@@ -1,6 +1,7 @@
-package manta
+package storage
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,7 +11,12 @@ import (
 	"time"
 
 	"github.com/hashicorp/errwrap"
+	"github.com/joyent/triton-go/client"
 )
+
+type DirectoryClient struct {
+	client *client.Client
+}
 
 // DirectoryEntry represents an object or directory in Manta.
 type DirectoryEntry struct {
@@ -34,9 +40,9 @@ type ListDirectoryOutput struct {
 	ResultSetSize uint64
 }
 
-// ListDirectory lists the contents of a directory.
-func (c *Client) ListDirectory(input *ListDirectoryInput) (*ListDirectoryOutput, error) {
-	path := fmt.Sprintf("/%s/stor/%s", c.accountName, input.DirectoryName)
+// List lists the contents of a directory on the Triton Object Store service.
+func (s *DirectoryClient) List(ctx context.Context, input *ListDirectoryInput) (*ListDirectoryOutput, error) {
+	path := fmt.Sprintf("/%s%s", s.client.AccountName, input.DirectoryName)
 	query := &url.Values{}
 	if input.Limit != 0 {
 		query.Set("limit", strconv.FormatUint(input.Limit, 10))
@@ -45,7 +51,12 @@ func (c *Client) ListDirectory(input *ListDirectoryInput) (*ListDirectoryOutput,
 		query.Set("manta_path", input.Marker)
 	}
 
-	respBody, respHeader, err := c.executeRequest(http.MethodGet, path, query, nil, nil)
+	reqInput := client.RequestInput{
+		Method: http.MethodGet,
+		Path:   path,
+		Query:  query,
+	}
+	respBody, respHeader, err := s.client.ExecuteRequestStorage(ctx, reqInput)
 	if respBody != nil {
 		defer respBody.Close()
 	}
@@ -83,15 +94,20 @@ type PutDirectoryInput struct {
 	DirectoryName string
 }
 
-// PutDirectory in the Joyent Manta Storage Service is an idempotent create-or-update
-// operation. Your private namespace starts at /:login/stor, and you can create any
-// nested set of directories or objects underneath that.
-func (c *Client) PutDirectory(input *PutDirectoryInput) error {
-	path := fmt.Sprintf("/%s/stor/%s", c.accountName, input.DirectoryName)
+// Put puts a directoy into the Triton Object Storage service is an idempotent
+// create-or-update operation. Your private namespace starts at /:login, and you
+// can create any nested set of directories or objects within it.
+func (s *DirectoryClient) Put(ctx context.Context, input *PutDirectoryInput) error {
+	path := fmt.Sprintf("/%s%s", s.client.AccountName, input.DirectoryName)
 	headers := &http.Header{}
 	headers.Set("Content-Type", "application/json; type=directory")
 
-	respBody, _, err := c.executeRequest(http.MethodPut, path, nil, headers, nil)
+	reqInput := client.RequestInput{
+		Method:  http.MethodPut,
+		Path:    path,
+		Headers: headers,
+	}
+	respBody, _, err := s.client.ExecuteRequestStorage(ctx, reqInput)
 	if respBody != nil {
 		defer respBody.Close()
 	}
@@ -107,11 +123,16 @@ type DeleteDirectoryInput struct {
 	DirectoryName string
 }
 
-// DeleteDirectory deletes a directory. The directory must be empty.
-func (c *Client) DeleteDirectory(input *DeleteDirectoryInput) error {
-	path := fmt.Sprintf("/%s/stor/%s", c.accountName, input.DirectoryName)
+// Delete deletes a directory on the Triton Object Storage. The directory must
+// be empty.
+func (s *DirectoryClient) Delete(ctx context.Context, input *DeleteDirectoryInput) error {
+	path := fmt.Sprintf("/%s%s", s.client.AccountName, input.DirectoryName)
 
-	respBody, _, err := c.executeRequest(http.MethodDelete, path, nil, nil, nil)
+	reqInput := client.RequestInput{
+		Method: http.MethodDelete,
+		Path:   path,
+	}
+	respBody, _, err := s.client.ExecuteRequestStorage(ctx, reqInput)
 	if respBody != nil {
 		defer respBody.Close()
 	}
