@@ -1,12 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"path"
 	"time"
 
-	manta "github.com/jen20/manta-go"
+	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -40,7 +41,7 @@ var getCmd = &cobra.Command{
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
-		output, err := client.GetObject(&manta.GetObjectInput{
+		output, err := client.Objects().Get(context.TODO(), &storage.GetObjectInput{
 			ObjectPath: path.Join("scrum", scrumDate.Format(scrumDateLayout), getUser()),
 		})
 		if err != nil {

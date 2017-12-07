@@ -1,13 +1,15 @@
 package cmd
 
 import (
+	"context"
 	"io"
 	"os"
 	"path"
 	"strings"
 	"time"
 
-	manta "github.com/jen20/manta-go"
+	"github.com/joyent/triton-go/client"
+	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -40,7 +42,7 @@ var setCmd = &cobra.Command{
 		//	log.Fatalf("Expected Engineer")
 		//}
 
-		client, err := getMantaClient()
+		c, err := getMantaClient()
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
@@ -73,13 +75,13 @@ var setCmd = &cobra.Command{
 			scrumPath := path.Join("scrum", scrumDate.Format(scrumDateLayout), getUser())
 
 			// Check if scrum exists
-			_, err = client.GetObject(&manta.GetObjectInput{
+			_, err = c.Objects().Get(context.TODO(), &storage.GetObjectInput{
 				ObjectPath: scrumPath,
 			})
 
 		ERROR_HANDLING:
 			switch {
-			case err != nil && manta.IsDirectoryDoesNotExistError(err):
+			case err != nil && client.IsDirectoryDoesNotExistError(err):
 				dirs := strings.Split(scrumDate.Format(scrumDateLayout), "/")
 				scrumDir := make([]string, 0, len(dirs)+1)
 				scrumDir = append(scrumDir, "scrum")
@@ -87,14 +89,14 @@ var setCmd = &cobra.Command{
 				// Unconditionally attempt to create all directories in the path
 				for _, dir := range dirs {
 					scrumDir = append(scrumDir, dir)
-					err = client.PutDirectory(&manta.PutDirectoryInput{
+					err = c.Dir().Put(context.TODO(), &storage.PutDirectoryInput{
 						DirectoryName: path.Join(scrumDir...),
 					})
 					if err != nil {
 						return errors.Wrap(err, "unable to put object")
 					}
 				}
-			case err != nil && !manta.IsResourceNotFoundError(err):
+			case err != nil && !client.IsResourceNotFoundError(err):
 				if viper.GetBool(configKeySetForce) {
 					// If we're overriding multiple days, increase the verbosity of the
 					// log messages (vs the common case, overriding just today, in which
@@ -146,7 +148,7 @@ var setCmd = &cobra.Command{
 				reader = f
 			}
 
-			if err := putObject(client, scrumPath, reader); err != nil {
+			if err := putObject(c, scrumPath, reader); err != nil {
 				return errors.Wrap(err, "unable to put object")
 			}
 
@@ -246,14 +248,16 @@ func max(a, b int) int {
 	return a
 }
 
-func putObject(client *manta.Client, scrumPath string, reader io.ReadSeeker) error {
-	err := client.PutObject(&manta.PutObjectInput{
+func putObject(c *storage.StorageClient, scrumPath string, reader io.ReadSeeker) error {
+	putInput := &storage.PutObjectInput{
 		ObjectPath:   scrumPath,
 		ObjectReader: reader,
-	})
-	if err != nil {
+	}
+
+	if err := c.Objects().Put(context.TODO(), putInput); err != nil {
 		return errors.Wrap(err, "unable to put object")
 	}
+
 	log.Info().Str("path", scrumPath).Msg("scrummed")
 
 	return nil

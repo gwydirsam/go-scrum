@@ -3,14 +3,15 @@ package cmd
 import (
 	"os"
 
-	manta "github.com/jen20/manta-go"
-	"github.com/jen20/manta-go/authentication"
+	triton "github.com/joyent/triton-go"
+	"github.com/joyent/triton-go/authentication"
+	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
-func getMantaClient() (*manta.Client, error) {
+func getMantaClient() (*storage.StorageClient, error) {
 	mantaAccount := viper.GetString(configKeyMantaAccount)
 	mantaURL := viper.GetString(configKeyMantaURL)
 	mantaKeyID := viper.GetString(configKeyMantaKeyID)
@@ -21,17 +22,16 @@ func getMantaClient() (*manta.Client, error) {
 		return nil, errors.Wrap(err, "unable to create new SSH agent signer")
 	}
 
-	client, err := manta.NewClient(&manta.ClientOptions{
-		Endpoint:    mantaURL,
+	c, err := storage.NewClient(&triton.ClientConfig{
+		MantaURL:    mantaURL,
 		AccountName: mantaAccount,
 		Signers:     []authentication.Signer{sshKeySigner},
-		Logger:      stdLogger,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create a new manta client")
 	}
 
-	return client, nil
+	return c, nil
 }
 
 func getUser() string {
