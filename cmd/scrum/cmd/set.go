@@ -52,8 +52,11 @@ var setCmd = &cobra.Command{
 		numVacation := viper.GetInt(configKeySetVacationDays)
 
 		// Build file string
-		// setup time format string to get current date
-		scrumDate := time.Now()
+		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyInputDate))
+		if err != nil {
+			return errors.Wrap(err, "unable to parse date")
+		}
+
 		switch {
 		case viper.GetBool(configKeyTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
@@ -62,7 +65,7 @@ var setCmd = &cobra.Command{
 		}
 
 		// create end date string for vacation and sick time
-		endDate := time.Now()
+		endDate := scrumDate
 		daysToScrum := 1
 		if numSick > 0 || numVacation > 0 {
 			daysToScrum = max(numSick, numVacation)
@@ -166,6 +169,20 @@ var setCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(setCmd)
+
+	{
+		const (
+			key         = configKeyInputDate
+			longName    = "date"
+			shortName   = "D"
+			description = "Date for scrum"
+		)
+		defaultValue := time.Now().Format(dateInputFormat)
+
+		setCmd.Flags().StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
 
 	{
 		const (
