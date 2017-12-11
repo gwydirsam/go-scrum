@@ -26,10 +26,10 @@
   version = "v1.0"
 
 [[projects]]
+  branch = "clean-path"
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
-  revision = "f649915525148817509b438ecdc379d0611a9be0"
-  version = "0.2.1"
+  revision = "102cb10375f26d51a6063edb1bee213e429d92e3"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -119,13 +119,13 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "9167dbfd0f8e88b731dd88cbf73a270701a37bb4"
+  revision = "b8f5ef32195cae6470b728e8ca677f0dbed1a004"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
-  revision = "be25de41fadfae372d6470bda81ca6beb55ef551"
+  revision = "3b24cac7bc3a458991ab409aa2a339ac9e0d60d6"
 
 [[projects]]
   branch = "v2"
@@ -136,6 +136,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0e16518516bf43cc531eb71fc5cde520b3b30cdaeebdba5ac90c7eaf9d6b3989"
+  inputs-digest = "6d0bd97cd28c33b17705f84af5236760548cd6142a686d63304b42eb92a181c7"
   solver-name = "gps-cdcl"
   solver-version = 1

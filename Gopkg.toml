@@ -18,6 +18,10 @@
 #  version = "2.4.0"
 
 [[constraint]]
+  branch = "clean-path"
+  name = "github.com/joyent/triton-go"
+
+[[constraint]]
   branch = "master"
   name = "github.com/mitchellh/go-homedir"
 
