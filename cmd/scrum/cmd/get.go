@@ -41,14 +41,16 @@ var getCmd = &cobra.Command{
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
-		output, err := client.Objects().Get(context.TODO(), &storage.GetObjectInput{
-			ObjectPath: path.Join("scrum", scrumDate.Format(scrumDateLayout), getUser()),
+		objectPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser())
+
+		output, err := client.Objects().Get(context.Background(), &storage.GetObjectInput{
+			ObjectPath: objectPath,
 		})
 		if err != nil {
 			return errors.Wrap(err, "unable to get manta object")
 		}
-
 		defer output.ObjectReader.Close()
+
 		body, err := ioutil.ReadAll(output.ObjectReader)
 		if err != nil {
 			return errors.Wrap(err, "unable to read manta object")

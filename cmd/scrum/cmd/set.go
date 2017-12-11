@@ -72,7 +72,7 @@ var setCmd = &cobra.Command{
 		var foundError bool
 	DAY_HANDLING:
 		for i := daysToScrum; i > 0; i-- {
-			scrumPath := path.Join("scrum", scrumDate.Format(scrumDateLayout), getUser())
+			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser())
 
 			// Check if scrum exists
 			_, err = c.Objects().Get(context.TODO(), &storage.GetObjectInput{
