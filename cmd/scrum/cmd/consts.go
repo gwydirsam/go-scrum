@@ -3,16 +3,16 @@ package cmd
 const (
 	dateInputFormat = "2006-01-02"
 
-	configKeyGetOptAll = "get.opt-all"
+	configKeyGetInputDate = "get.date"
+	configKeyGetOptAll    = "get.opt-all"
 
 	configKeyInitFilename = "init.config-file"
 
-	configKeyInputDate = "date"
-
-	configKeyListUsers    = "mode.list-users"
-	configKeyListUsersAll = "list.opt-all"
-	configKeyListUsersOne = "list.opt-one"
-	configKeyListUsersUTC = "list.opt-utc"
+	configKeyListInputDate = "list.date"
+	configKeyListUsers     = "list.mode"
+	configKeyListUsersAll  = "list.opt-all"
+	configKeyListUsersOne  = "list.opt-one"
+	configKeyListUsersUTC  = "list.opt-utc"
 
 	configKeyLogFormat    = "log.format"
 	configKeyLogLevel     = "log.level"
@@ -25,6 +25,7 @@ const (
 
 	configKeySetFilename     = "set.input-filename"
 	configKeySetForce        = "set.force"
+	configKeySetInputDate    = "set.date"
 	configKeySetNumDays      = "set.num-days"
 	configKeySetSickDays     = "set.sick-days"
 	configKeySetVacationDays = "set.vacation-days"
@@ -35,6 +36,15 @@ const (
 	scrumDateLayout = "2006/01/02"
 )
 
-var ignoreMap = map[string]struct{}{
-	"all": struct{}{},
+type _UsernameAction int
+
+const (
+	_Show _UsernameAction = iota
+	_Ignore
+)
+
+var usernameActionMap = map[string]_UsernameAction{
+	"all":          _Ignore,
+	"all1999.html": _Ignore,
+	"rollup":       _Ignore,
 }

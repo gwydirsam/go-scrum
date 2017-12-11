@@ -52,7 +52,7 @@ var setCmd = &cobra.Command{
 		numVacation := viper.GetInt(configKeySetVacationDays)
 
 		// Build file string
-		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyInputDate))
+		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeySetInputDate))
 		if err != nil {
 			return errors.Wrap(err, "unable to parse date")
 		}
@@ -172,7 +172,7 @@ func init() {
 
 	{
 		const (
-			key         = configKeyInputDate
+			key         = configKeySetInputDate
 			longName    = "date"
 			shortName   = "D"
 			description = "Date for scrum"

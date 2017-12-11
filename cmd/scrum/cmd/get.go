@@ -33,7 +33,7 @@ func init() {
 
 	{
 		const (
-			key         = configKeyInputDate
+			key         = configKeyGetInputDate
 			longName    = "date"
 			shortName   = "D"
 			description = "Date for scrum"
@@ -92,7 +92,7 @@ var getCmd = &cobra.Command{
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
 
-		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyInputDate))
+		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyGetInputDate))
 		if err != nil {
 			return errors.Wrap(err, "unable to parse date")
 		}
@@ -133,7 +133,7 @@ func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
 
 	var firstError error
 	for _, ent := range dirEnts.Entries {
-		if _, found := ignoreMap[ent.Name]; found {
+		if v, found := usernameActionMap[ent.Name]; found && v == _Ignore {
 			continue
 		}
 
