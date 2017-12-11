@@ -1,12 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"path"
 	"time"
 
-	manta "github.com/jen20/manta-go"
+	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +32,7 @@ var rollupCmd = &cobra.Command{
 		}
 
 		// setup time format string to get current date
-		output, err := client.GetObject(&manta.GetObjectInput{
+		output, err := client.Objects().Get(context.TODO(), &storage.GetObjectInput{
 			ObjectPath: path.Join("scrum", time.Now().Format(scrumDateLayout), getUser()),
 		})
 		if err != nil {

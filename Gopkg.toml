@@ -18,13 +18,12 @@
 #  version = "2.4.0"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/mitchellh/go-homedir"
+  branch = "fix-flaky-list-op"
+  name = "github.com/joyent/triton-go"
 
 [[constraint]]
-  branch = "logger-option"
-  name = "github.com/jen20/manta-go"
-  source = "github.com/sean-/manta-go"
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
 
 [[constraint]]
   branch = "master"
