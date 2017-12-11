@@ -228,6 +228,18 @@ func init() {
 
 	{
 		const (
+			key               = configKeyUsername
+			longOpt, shortOpt = "user", "u"
+			defaultValue      = "$USER"
+		)
+		setCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "set scrum for specified user")
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
+		viper.BindEnv(key, "USER")
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
 			key          = configKeySetVacationDays
 			longName     = "vacation"
 			shortName    = "v"

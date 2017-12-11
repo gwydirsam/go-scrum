@@ -240,14 +240,6 @@ func init() {
 		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 	}
 
-	{
-		const key = configKeyUsername
-		const longOpt, shortOpt = "user", "u"
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$USER", "username to scrum as")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
-		viper.BindEnv(key, "USER")
-	}
-
 	cobra.OnInitialize(initConfig)
 }
 

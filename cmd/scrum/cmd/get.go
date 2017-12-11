@@ -45,8 +45,19 @@ func init() {
 		viper.SetDefault(key, defaultValue)
 	}
 
+	{
+		const (
+			key               = configKeyUsername
+			longOpt, shortOpt = "user", "u"
+			defaultValue      = "$USER"
+		)
+		getCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "get scrum for specified user")
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
+		viper.BindEnv(key, "USER")
+		viper.SetDefault(key, defaultValue)
+	}
+
 	rootCmd.AddCommand(getCmd)
-	getCmd.MarkFlagRequired("user")
 }
 
 var getCmd = &cobra.Command{
