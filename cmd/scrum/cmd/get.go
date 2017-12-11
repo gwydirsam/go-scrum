@@ -1,17 +1,53 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
-	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
 	"path"
 	"time"
 
 	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+func init() {
+	{
+		const (
+			key          = configKeyGetOptAll
+			longName     = "all"
+			shortName    = "a"
+			defaultValue = false
+			description  = "Get all user scrums"
+		)
+
+		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key         = configKeyInputDate
+			longName    = "date"
+			shortName   = "D"
+			description = "Date for scrum"
+		)
+		defaultValue := time.Now().Format(dateInputFormat)
+
+		getCmd.Flags().StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	rootCmd.AddCommand(getCmd)
+	getCmd.MarkFlagRequired("user")
+}
 
 var getCmd = &cobra.Command{
 	Use:          "get",
@@ -34,35 +70,83 @@ var getCmd = &cobra.Command{
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
 
-		// setup time format string to get current date
-		scrumDate := time.Now()
+		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyInputDate))
+		if err != nil {
+			return errors.Wrap(err, "unable to parse date")
+		}
+
 		switch {
 		case viper.GetBool(configKeyTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
-		objectPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser())
-
-		output, err := client.Objects().Get(context.Background(), &storage.GetObjectInput{
-			ObjectPath: objectPath,
-		})
-		if err != nil {
-			return errors.Wrap(err, "unable to get manta object")
+		switch {
+		case viper.GetBool(configKeyGetOptAll):
+			return getAllScrum(client, scrumDate)
+		case !viper.GetBool(configKeyGetOptAll):
+			return getSingleScrum(os.Stdout, client, scrumDate, getUser())
+		default:
+			return errors.New("unsupported get mode")
 		}
-		defer output.ObjectReader.Close()
-
-		body, err := ioutil.ReadAll(output.ObjectReader)
-		if err != nil {
-			return errors.Wrap(err, "unable to read manta object")
-		}
-
-		fmt.Printf("%s", string(body))
-
-		return nil
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(getCmd)
-	getCmd.MarkFlagRequired("user")
+func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
+	scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout))
+
+	dirEnts, err := c.Dir().List(context.Background(), &storage.ListDirectoryInput{
+		DirectoryName: scrumPath,
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to list manta directory")
+	}
+
+	if dirEnts.ResultSetSize == 0 {
+		log.Error().Time("scrum-date", scrumDate).Msg("no users have scrummed for this day")
+		return nil
+	}
+
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
+
+	var firstError error
+	for _, ent := range dirEnts.Entries {
+		if _, found := ignoreMap[ent.Name]; found {
+			continue
+		}
+
+		if err := getSingleScrum(w, c, scrumDate, ent.Name); err != nil {
+			log.Error().Err(err).Str("username", ent.Name).Msg("unable to get user's scrum")
+			if firstError == nil {
+				firstError = err
+			}
+		}
+	}
+
+	if firstError != nil {
+		return firstError
+	}
+
+	return nil
+}
+
+func getSingleScrum(w io.Writer, c *storage.StorageClient, scrumDate time.Time, user string) error {
+	objectPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), user)
+
+	output, err := c.Objects().Get(context.Background(), &storage.GetObjectInput{
+		ObjectPath: objectPath,
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to get manta object")
+	}
+	defer output.ObjectReader.Close()
+
+	body, err := ioutil.ReadAll(output.ObjectReader)
+	if err != nil {
+		return errors.Wrap(err, "unable to read manta object")
+	}
+
+	w.Write(body)
+
+	return nil
 }

@@ -1,7 +1,13 @@
 package cmd
 
 const (
+	dateInputFormat = "2006-01-02"
+
+	configKeyGetOptAll = "get.opt-all"
+
 	configKeyInitFilename = "init.config-file"
+
+	configKeyInputDate = "date"
 
 	configKeyLogFormat    = "log.format"
 	configKeyLogLevel     = "log.level"
@@ -23,3 +29,7 @@ const (
 
 	scrumDateLayout = "2006/01/02"
 )
+
+var ignoreMap = map[string]struct{}{
+	"all": struct{}{},
+}
