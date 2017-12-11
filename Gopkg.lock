@@ -26,10 +26,10 @@
   version = "v1.0"
 
 [[projects]]
-  branch = "fix-flaky-list-op"
+  branch = "master"
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
-  revision = "bf2eb9d5dc098f0540ad533efa0139fdc5bf1c45"
+  revision = "b519eaf447296ec203c97149777be5f26fc205cc"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -142,6 +142,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "25c844a8296fe43128882cf4dc8c0c44ffdaefbecf1397d8f33b6b90d1ee4a45"
+  inputs-digest = "2557ae2f4852c2807aa0d749bd67dadbfd6faa236ef1a4cdfb138c3ac552773b"
   solver-name = "gps-cdcl"
   solver-version = 1
