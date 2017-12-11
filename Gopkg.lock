@@ -29,7 +29,7 @@
   branch = "clean-path"
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
-  revision = "102cb10375f26d51a6063edb1bee213e429d92e3"
+  revision = "c7cdc2e9c5896fc0989c54779c5d1cf1def13aad"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -72,6 +72,12 @@
   packages = [".","internal/json","log"]
   revision = "3ac71fc58dbd43122668a912b755b0979ba9ce1f"
   version = "v1.3.0"
+
+[[projects]]
+  name = "github.com/ryanuber/columnize"
+  packages = ["."]
+  revision = "983d3a5fab1bf04d1b412465d2d9f8430e2e917e"
+  version = "v2.1.0"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -136,6 +142,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6d0bd97cd28c33b17705f84af5236760548cd6142a686d63304b42eb92a181c7"
+  inputs-digest = "501b3d30e2ed85929c48eb5a0a5dbc883fcfb2ae12970d4ba35f5cc42ced56c3"
   solver-name = "gps-cdcl"
   solver-version = 1
