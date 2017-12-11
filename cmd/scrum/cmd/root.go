@@ -233,13 +233,6 @@ func init() {
 		viper.BindEnv(key, "MANTA_USER")
 	}
 
-	{
-		const key = configKeyTomorrow
-		const longOpt, shortOpt = key, "t"
-		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, false, "Scrum for tomorrow")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
-	}
-
 	cobra.OnInitialize(initConfig)
 }
 

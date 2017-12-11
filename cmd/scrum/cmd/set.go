@@ -204,7 +204,7 @@ func init() {
 			longName     = "days"
 			shortName    = "d"
 			defaultValue = 0
-			description  = "Scrum for n days from now"
+			description  = "Recycle scrum update for N days"
 		)
 
 		setCmd.Flags().UintP(longName, shortName, defaultValue, description)
@@ -218,7 +218,7 @@ func init() {
 			longName     = "sick"
 			shortName    = "s"
 			defaultValue = 0
-			description  = "Sick leave for n days"
+			description  = "Sick leave for N days"
 		)
 
 		setCmd.Flags().UintP(longName, shortName, defaultValue, description)
@@ -228,11 +228,22 @@ func init() {
 
 	{
 		const (
+			key               = configKeyTomorrow
+			longOpt, shortOpt = key, "t"
+			defaultValue      = false
+		)
+		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the next day")
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
 			key               = configKeyUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
 		)
-		setCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "set scrum for specified user")
+		setCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "Set scrum for specified user")
 		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
 		viper.BindEnv(key, "USER")
 		viper.SetDefault(key, defaultValue)

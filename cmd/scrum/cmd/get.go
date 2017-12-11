@@ -23,7 +23,7 @@ func init() {
 			longName     = "all"
 			shortName    = "a"
 			defaultValue = false
-			description  = "Get all user scrums"
+			description  = "Get scrum for all users"
 		)
 
 		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
@@ -47,11 +47,22 @@ func init() {
 
 	{
 		const (
+			key               = configKeyTomorrow
+			longOpt, shortOpt = key, "t"
+			defaultValue      = false
+		)
+		getCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Get scrum for the next day")
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
 			key               = configKeyUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
 		)
-		getCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "get scrum for specified user")
+		getCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "Get scrum for specified user")
 		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
 		viper.BindEnv(key, "USER")
 		viper.SetDefault(key, defaultValue)

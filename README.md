@@ -1,6 +1,6 @@
 # `scrum`
 
-A Joyent scrum submission utility.
+A Joyent scrum utility.
 
 ## Installation
 
@@ -40,6 +40,7 @@ Available Commands:
   get         Get scrum information
   help        Help about any command
   init        Generate an initial scrum configuration file
+  list        List scrum information
   set         Set scrum information
 
 Flags:
@@ -50,9 +51,7 @@ Flags:
       --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
   -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
-  -t, --tomorrow               Scrum for tomorrow
-      --use-color              Use ASCII colors (default true)
-  -u, --user string            username to scrum as (default "$USER")
+      --use-color              Use ASCII colors
 
 Use "scrum [command] --help" for more information about a command.
 ```
@@ -60,7 +59,7 @@ Use "scrum [command] --help" for more information about a command.
 ### `scrum get` Usage
 
 ```
-$ scrum get 
+$ scrum get
 Vacation until 2017/11/24
 $ scrum get -h
 Get scrum information, either for yourself or teammates
@@ -73,7 +72,11 @@ Examples:
   $ scrum get -t -u other.username # Get other.username's scrum for tomorrow
 
 Flags:
-  -h, --help   help for get
+  -a, --all           Get scrum for all users
+  -D, --date string   Date for scrum (default "2017-12-11")
+  -h, --help          help for get
+  -t, --tomorrow      Get scrum for the next day
+  -u, --user string   Get scrum for specified user (default "$USER")
 
 Global Flags:
   -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
@@ -82,9 +85,7 @@ Global Flags:
       --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
   -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
-  -t, --tomorrow               Scrum for tomorrow
-      --use-color              Use ASCII colors (default true)
-  -u, --user string            username to scrum as (default "$USER")
+      --use-color              Use ASCII colors
 ```
 
 ### `scrum set` Usage
@@ -101,11 +102,14 @@ Examples:
   $ scrum set -t -u other.username -i tomorrow.md # Set other.username's scrum for tomorrow
 
 Flags:
-  -d, --days uint       Scrum for n days from now
+  -D, --date string     Date for scrum (default "2017-12-11")
+  -d, --days uint       Recycle scrum update for N days
   -i, --file string     File to read scrum from
   -f, --force           Force overwrite of any present scrum
   -h, --help            help for set
-  -s, --sick uint       Sick leave for n days
+  -s, --sick uint       Sick leave for N days
+  -t, --tomorrow        Set scrum for the next day
+  -u, --user string     Set scrum for specified user (default "$USER")
   -v, --vacation uint   Vacation for N days
 
 Global Flags:
@@ -115,9 +119,42 @@ Global Flags:
       --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
   -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
-  -t, --tomorrow               Scrum for tomorrow
-      --use-color              Use ASCII colors (default true)
-  -u, --user string            username to scrum as (default "$USER")
+      --use-color              Use ASCII colors
+```
+
+### `scrum list` Usage
+
+```
+$ scrum list -h
+List scrum information for the day
+
+Usage:
+  scrum list [flags]
+
+Aliases:
+  list, ls, dir
+
+Examples:
+  $ scrum list                      # List scrummers for the day
+  $ scrum list -t
+
+Flags:
+  -D, --date string      Date for scrum (default "2017-12-11")
+  -h, --help             help for list
+  -L, --list-users       List usernames who scrummed for a given day
+  -a, --list-users-all   List all metadata details (default true)
+  -1, --list-users-one   List no metadata
+  -Z, --mtime-utc        List mtime data in UTC
+  -t, --tomorrow         List scrums for the next day
+
+Global Flags:
+  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string   Manta account name (default "Joyent_Dev")
+      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+      --use-color              Use ASCII colors
 ```
 
 ## `direnv`

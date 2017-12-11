@@ -22,7 +22,7 @@ func init() {
 			key          = configKeyListUsersOne
 			longName     = "list-users-one"
 			shortName    = "1"
-			defaultValue = true
+			defaultValue = false
 			description  = "List no metadata"
 		)
 
@@ -70,6 +70,17 @@ func init() {
 
 		listCmd.Flags().BoolP(longName, shortName, defaultValue, description)
 		viper.BindPFlag(key, listCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key               = configKeyTomorrow
+			longOpt, shortOpt = key, "t"
+			defaultValue      = false
+		)
+		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrums for the next day")
+		viper.BindPFlag(key, listCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -146,15 +157,22 @@ func listScrummers(c *storage.StorageClient, scrumDate time.Time) error {
 	defer w.Flush()
 
 	switch {
+	case viper.IsSet(configKeyListUsersOne) && viper.GetBool(configKeyListUsersOne):
+		for _, ent := range dirEnts.Entries {
+			if _, found := ignoreMap[ent.Name]; found {
+				continue
+			}
+
+			fmt.Fprintln(w, ent.Name)
+		}
+
+		return nil
 	case viper.GetBool(configKeyListUsersAll):
 		var tz string
-		{
-			now := time.Now()
-			if viper.GetBool(configKeyListUsersUTC) {
-				tz, _ = now.UTC().Zone()
-			} else {
-				tz, _ = now.Local().Zone()
-			}
+		if viper.GetBool(configKeyListUsersUTC) {
+			tz, _ = scrumDate.UTC().Zone()
+		} else {
+			tz, _ = scrumDate.Local().Zone()
 		}
 
 		output := make([]string, 0, dirEnts.ResultSetSize+1)
@@ -177,16 +195,6 @@ func listScrummers(c *storage.StorageClient, scrumDate time.Time) error {
 		}
 
 		fmt.Fprintln(w, columnize.SimpleFormat(output))
-
-		return nil
-	case viper.GetBool(configKeyListUsersOne):
-		for _, ent := range dirEnts.Entries {
-			if _, found := ignoreMap[ent.Name]; found {
-				continue
-			}
-
-			fmt.Fprintln(w, ent.Name)
-		}
 
 		return nil
 	default:
