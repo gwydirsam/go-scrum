@@ -9,6 +9,11 @@ const (
 
 	configKeyInputDate = "date"
 
+	configKeyListUsers    = "mode.list-users"
+	configKeyListUsersAll = "list.opt-all"
+	configKeyListUsersOne = "list.opt-one"
+	configKeyListUsersUTC = "list.opt-utc"
+
 	configKeyLogFormat    = "log.format"
 	configKeyLogLevel     = "log.level"
 	configKeyLogTermColor = "log.use-color"
