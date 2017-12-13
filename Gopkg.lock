@@ -29,7 +29,7 @@
   branch = "master"
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
-  revision = "b519eaf447296ec203c97149777be5f26fc205cc"
+  revision = "7789d8fbf3114e3aca14b9ed7c6a104900d744b0"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -125,7 +125,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "b8f5ef32195cae6470b728e8ca677f0dbed1a004"
+  revision = "53aa286056ef226755cd898109dbcdaba8ac0b81"
 
 [[projects]]
   branch = "master"
