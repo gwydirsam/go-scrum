@@ -47,8 +47,8 @@ func init() {
 
 	{
 		const (
-			key               = configKeyTomorrow
-			longOpt, shortOpt = key, "t"
+			key               = configKeyGetTomorrow
+			longOpt, shortOpt = "tomorrow", "t"
 			defaultValue      = false
 		)
 		getCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Get scrum for the next day")
@@ -58,7 +58,7 @@ func init() {
 
 	{
 		const (
-			key               = configKeyUsername
+			key               = configKeyGetUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
 		)
@@ -98,7 +98,7 @@ var getCmd = &cobra.Command{
 		}
 
 		switch {
-		case viper.GetBool(configKeyTomorrow):
+		case viper.GetBool(configKeyGetTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
@@ -106,7 +106,7 @@ var getCmd = &cobra.Command{
 		case viper.GetBool(configKeyGetOptAll):
 			return getAllScrum(client, scrumDate)
 		case !viper.GetBool(configKeyGetOptAll):
-			return getSingleScrum(os.Stdout, client, scrumDate, getUser())
+			return getSingleScrum(os.Stdout, client, scrumDate, getUser(configKeyGetUsername))
 		default:
 			return errors.New("unsupported get mode")
 		}

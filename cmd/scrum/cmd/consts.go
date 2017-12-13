@@ -5,10 +5,13 @@ const (
 
 	configKeyGetInputDate = "get.date"
 	configKeyGetOptAll    = "get.opt-all"
+	configKeyGetTomorrow  = "get.tomorrow"
+	configKeyGetUsername  = "get.username"
 
 	configKeyInitFilename = "init.config-file"
 
 	configKeyListInputDate = "list.date"
+	configKeyListTomorrow  = "list.tomorrow"
 	configKeyListUsers     = "list.mode"
 	configKeyListUsersAll  = "list.opt-all"
 	configKeyListUsersOne  = "list.opt-one"
@@ -28,10 +31,9 @@ const (
 	configKeySetInputDate    = "set.date"
 	configKeySetNumDays      = "set.num-days"
 	configKeySetSickDays     = "set.sick-days"
+	configKeySetTomorrow     = "set.tomorrow"
+	configKeySetUsername     = "set.username"
 	configKeySetVacationDays = "set.vacation-days"
-
-	configKeyTomorrow = "tomorrow"
-	configKeyUsername = "username"
 
 	scrumDateLayout = "2006/01/02"
 )

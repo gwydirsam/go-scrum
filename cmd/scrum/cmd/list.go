@@ -75,7 +75,7 @@ func init() {
 
 	{
 		const (
-			key               = configKeyTomorrow
+			key               = configKeyListTomorrow
 			longOpt, shortOpt = key, "t"
 			defaultValue      = false
 		)
@@ -129,7 +129,7 @@ var listCmd = &cobra.Command{
 		}
 
 		switch {
-		case viper.GetBool(configKeyTomorrow):
+		case viper.GetBool(configKeyListTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 

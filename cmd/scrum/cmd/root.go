@@ -258,10 +258,6 @@ func checkRequiredFlags(flags *pflag.FlagSet) error {
 		return errors.New("Required flag `" + flagName + "` has not been set")
 	}
 
-	if user := getUser(); user == "" {
-		return errors.New("unable to find a username")
-	}
-
 	return nil
 }
 
