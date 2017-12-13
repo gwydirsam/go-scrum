@@ -3,17 +3,22 @@ package cmd
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"github.com/ryanuber/columnize"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func init() {
@@ -102,11 +107,13 @@ var getCmd = &cobra.Command{
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
+		color.NoColor = !viper.GetBool(configKeyLogTermColor)
+
 		switch {
 		case viper.GetBool(configKeyGetOptAll):
 			return getAllScrum(client, scrumDate)
 		case !viper.GetBool(configKeyGetOptAll):
-			return getSingleScrum(os.Stdout, client, scrumDate, getUser(configKeyGetUsername))
+			return getSingleScrum(os.Stdout, client, scrumDate, getUser(configKeyGetUsername), false)
 		default:
 			return errors.New("unsupported get mode")
 		}
@@ -131,13 +138,24 @@ func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
+	const defaultTerminalWidth = 80
+	terminalWidth, _, err := terminal.GetSize(int(os.Stdin.Fd()))
+	if err != nil {
+		log.Warn().Err(err).Msg("unable to get terminal size, using default")
+		terminalWidth = defaultTerminalWidth
+	}
+
+	horizontalSeparator := strings.Repeat("-", terminalWidth) + "\n"
+
 	var firstError error
 	for _, ent := range dirEnts.Entries {
 		if v, found := usernameActionMap[ent.Name]; found && v == _Ignore {
 			continue
 		}
 
-		if err := getSingleScrum(w, c, scrumDate, ent.Name); err != nil {
+		w.WriteString(horizontalSeparator)
+
+		if err := getSingleScrum(w, c, scrumDate, ent.Name, true); err != nil {
 			log.Error().Err(err).Str("username", ent.Name).Msg("unable to get user's scrum")
 			if firstError == nil {
 				firstError = err
@@ -152,20 +170,31 @@ func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
 	return nil
 }
 
-func getSingleScrum(w io.Writer, c *storage.StorageClient, scrumDate time.Time, user string) error {
+func getSingleScrum(w io.Writer, c *storage.StorageClient, scrumDate time.Time, user string, includeHeader bool) error {
 	objectPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), user)
 
-	output, err := c.Objects().Get(context.Background(), &storage.GetObjectInput{
+	obj, err := c.Objects().Get(context.Background(), &storage.GetObjectInput{
 		ObjectPath: objectPath,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to get manta object")
 	}
-	defer output.ObjectReader.Close()
+	defer obj.ObjectReader.Close()
 
-	body, err := ioutil.ReadAll(output.ObjectReader)
+	body, err := ioutil.ReadAll(obj.ObjectReader)
 	if err != nil {
 		return errors.Wrap(err, "unable to read manta object")
+	}
+
+	if includeHeader {
+		key := color.New(color.Bold, color.FgWhite).SprintFunc()
+		value := color.New(color.FgWhite, color.Underline).SprintFunc()
+
+		output := []string{
+			fmt.Sprintf("%s | %s", key("user"), value(user)),
+			fmt.Sprintf("%s | %s", key("mtime"), value(obj.LastModified.Local().String())),
+		}
+		w.Write([]byte(columnize.SimpleFormat(output) + "\n\n"))
 	}
 
 	w.Write(body)
