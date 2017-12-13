@@ -18,7 +18,7 @@
 #  version = "2.4.0"
 
 [[constraint]]
-  branch = "fix-flaky-list-op"
+  branch = "master"
   name = "github.com/joyent/triton-go"
 
 [[constraint]]

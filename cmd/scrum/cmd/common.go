@@ -34,10 +34,10 @@ func getMantaClient() (*storage.StorageClient, error) {
 	return c, nil
 }
 
-func getUser() string {
+func getUser(userKey string) string {
 	switch {
-	case viper.IsSet(configKeyUsername):
-		return interpolateValue(viper.GetString(configKeyUsername))
+	case viper.IsSet(userKey):
+		return interpolateValue(viper.GetString(userKey))
 	case viper.IsSet(configKeyMantaUser):
 		return interpolateValue(viper.GetString(configKeyMantaUser))
 	}
@@ -47,12 +47,12 @@ func getUser() string {
 		return interpolateValue(user)
 	}
 
-	user = viper.GetString(configKeyUsername)
+	user = viper.GetString(userKey)
 	if user != "" {
 		return interpolateValue(user)
 	}
 
-	log.Warn().Msgf("unable to detect a username, please set %q or %q in %q", configKeyUsername, configKeyMantaUser, viper.ConfigFileUsed)
+	log.Warn().Msgf("unable to detect a username, please set %q or %q in %q", userKey, configKeyMantaUser, viper.ConfigFileUsed)
 	return ""
 }
 

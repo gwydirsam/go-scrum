@@ -171,7 +171,7 @@ type PutObjectInput struct {
 	IfModifiedSince  *time.Time
 	ContentLength    uint64
 	MaxContentLength uint64
-	ObjectReader     io.ReadSeeker
+	ObjectReader     io.Reader
 	Headers          map[string]string
 }
 

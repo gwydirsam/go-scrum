@@ -52,13 +52,13 @@ var setCmd = &cobra.Command{
 		numVacation := viper.GetInt(configKeySetVacationDays)
 
 		// Build file string
-		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyInputDate))
+		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeySetInputDate))
 		if err != nil {
 			return errors.Wrap(err, "unable to parse date")
 		}
 
 		switch {
-		case viper.GetBool(configKeyTomorrow):
+		case viper.GetBool(configKeySetTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		case numDays != 0:
 			scrumDate = scrumDate.AddDate(0, 0, numDays)
@@ -75,7 +75,7 @@ var setCmd = &cobra.Command{
 		var foundError bool
 	DAY_HANDLING:
 		for i := daysToScrum; i > 0; i-- {
-			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser())
+			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeySetUsername))
 
 			// Check if scrum exists
 			_, err = c.Objects().Get(context.TODO(), &storage.GetObjectInput{
@@ -136,18 +136,36 @@ var setCmd = &cobra.Command{
 				continue DAY_HANDLING
 			}
 
-			var reader io.ReadSeeker
+			var reader io.Reader
 			switch {
 			case numSick != 0:
 				reader = strings.NewReader("Sick leave until " + endDate.Format(scrumDateLayout) + "\n")
 			case numVacation != 0:
 				reader = strings.NewReader("Vacation until " + endDate.Format(scrumDateLayout) + "\n")
+			case viper.GetString(configKeySetFilename) == "":
+				return errors.New("empty filename specified, use '-' as the input filename to use stdin")
+			case viper.GetString(configKeySetFilename) == "-":
+				reader = os.Stdin
 			case viper.GetString(configKeySetFilename) != "":
 				f, err := os.Open(viper.GetString(configKeySetFilename))
 				if err != nil {
-					return errors.Wrap(err, "unable to open file")
+					return errors.Wrap(err, "unable to open(2) file")
 				}
 				defer f.Close()
+
+				sb, err := f.Stat()
+				if err != nil {
+					return errors.Wrap(err, "unable to stat(2) file")
+				}
+
+				if !sb.Mode().IsRegular() {
+					return errors.Wrapf(err, "%q is not a regular file", viper.GetString(configKeySetFilename))
+				}
+
+				if sb.Size() == 0 {
+					return errors.Errorf("scrum input is not a zero-byte file (%q)", viper.GetString(configKeySetFilename))
+				}
+
 				reader = f
 			}
 
@@ -172,7 +190,7 @@ func init() {
 
 	{
 		const (
-			key         = configKeyInputDate
+			key         = configKeySetInputDate
 			longName    = "date"
 			shortName   = "D"
 			description = "Date for scrum"
@@ -228,8 +246,8 @@ func init() {
 
 	{
 		const (
-			key               = configKeyTomorrow
-			longOpt, shortOpt = key, "t"
+			key               = configKeySetTomorrow
+			longOpt, shortOpt = "tomorrow", "t"
 			defaultValue      = false
 		)
 		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the next day")
@@ -239,7 +257,7 @@ func init() {
 
 	{
 		const (
-			key               = configKeyUsername
+			key               = configKeySetUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
 		)
@@ -288,7 +306,7 @@ func max(a, b int) int {
 	return a
 }
 
-func putObject(c *storage.StorageClient, scrumPath string, reader io.ReadSeeker) error {
+func putObject(c *storage.StorageClient, scrumPath string, reader io.Reader) error {
 	putInput := &storage.PutObjectInput{
 		ObjectPath:   scrumPath,
 		ObjectReader: reader,

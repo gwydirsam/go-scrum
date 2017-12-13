@@ -47,7 +47,7 @@ func init() {
 
 	{
 		const (
-			key         = configKeyInputDate
+			key         = configKeyListInputDate
 			longName    = "date"
 			shortName   = "D"
 			description = "Date for scrum"
@@ -75,7 +75,7 @@ func init() {
 
 	{
 		const (
-			key               = configKeyTomorrow
+			key               = configKeyListTomorrow
 			longOpt, shortOpt = key, "t"
 			defaultValue      = false
 		)
@@ -123,13 +123,13 @@ var listCmd = &cobra.Command{
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
 
-		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyInputDate))
+		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyListInputDate))
 		if err != nil {
 			return errors.Wrap(err, "unable to parse date")
 		}
 
 		switch {
-		case viper.GetBool(configKeyTomorrow):
+		case viper.GetBool(configKeyListTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
@@ -159,7 +159,7 @@ func listScrummers(c *storage.StorageClient, scrumDate time.Time) error {
 	switch {
 	case viper.IsSet(configKeyListUsersOne) && viper.GetBool(configKeyListUsersOne):
 		for _, ent := range dirEnts.Entries {
-			if _, found := ignoreMap[ent.Name]; found {
+			if v, found := usernameActionMap[ent.Name]; found && v == _Ignore {
 				continue
 			}
 
@@ -181,7 +181,7 @@ func listScrummers(c *storage.StorageClient, scrumDate time.Time) error {
 		const mtimeFormat = "2006/01/02 15:04:05"
 
 		for _, ent := range dirEnts.Entries {
-			if _, found := ignoreMap[ent.Name]; found {
+			if v, found := usernameActionMap[ent.Name]; found && v == _Ignore {
 				continue
 			}
 
