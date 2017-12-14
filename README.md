@@ -62,7 +62,7 @@ Use "scrum [command] --help" for more information about a command.
 $ scrum get
 Vacation until 2017/11/24
 $ scrum get -h
-Get scrum information, either for yourself or teammates
+Get scrum information, either for yourself (or teammates)
 
 Usage:
   scrum get [flags]
@@ -76,7 +76,10 @@ Flags:
   -D, --date string   Date for scrum (default "2017-12-11")
   -h, --help          help for get
   -t, --tomorrow      Get scrum for the next day
+  -P, --use-pager     Use a pager to read the output (defaults to $PAGER, less(1), or more(1)) (default true)
   -u, --user string   Get scrum for specified user (default "$USER")
+  -Z, --utc           Get mtime data in UTC
+  -y, --yesterday     Get scrum for yesterday
 
 Global Flags:
   -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
@@ -92,14 +95,14 @@ Global Flags:
 
 ```
 $ scrum set -h
-Set scrum information, either for yourself or teammates
+Set scrum information, either for yourself (or teammates)
 
 Usage:
   scrum set [flags]
 
 Examples:
   $ scrum set -i today.md                         # Set my scrum using today.md
-  $ scrum set -t -u other.username -i tomorrow.md # Set other.username's scrum for tomorrow
+  $ scrum set -u other.username -t -i tomorrow.md # Set other.username's scrum for tomorrow
 
 Flags:
   -D, --date string     Date for scrum (default "2017-12-11")
@@ -131,21 +134,18 @@ List scrum information for the day
 Usage:
   scrum list [flags]
 
-Aliases:
-  list, ls, dir
-
 Examples:
   $ scrum list                      # List scrummers for the day
   $ scrum list -t
 
 Flags:
-  -D, --date string      Date for scrum (default "2017-12-11")
-  -h, --help             help for list
-  -L, --list-users       List usernames who scrummed for a given day
-  -a, --list-users-all   List all metadata details (default true)
-  -1, --list-users-one   List no metadata
-  -Z, --mtime-utc        List mtime data in UTC
-  -t, --tomorrow         List scrums for the next day
+  -a, --all           List all metadata details (default true)
+  -D, --date string   Date for scrum (default "2017-12-11")
+  -h, --help          help for list
+  -t, --tomorrow      List scrums for the next day
+  -1, --usernames     List usernames only
+  -Z, --utc           List mtime data in UTC
+  -y, --yesterday     List scrum for yesterday
 
 Global Flags:
   -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")

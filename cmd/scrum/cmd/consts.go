@@ -9,6 +9,7 @@ const (
 	configKeyGetUTC       = "get.utc"
 	configKeyGetUsePager  = "get.use-pager"
 	configKeyGetUsername  = "get.username"
+	configKeyGetYesterday = "get.yesterday"
 
 	configKeyInitFilename = "init.config-file"
 
@@ -18,6 +19,7 @@ const (
 	configKeyListUsersAll  = "list.opt-all"
 	configKeyListUsersOne  = "list.opt-one"
 	configKeyListUsersUTC  = "list.opt-utc"
+	configKeyListYesterday = "list.yesterday"
 
 	configKeyLogFormat    = "log.format"
 	configKeyLogLevel     = "log.level"
@@ -36,6 +38,7 @@ const (
 	configKeySetTomorrow     = "set.tomorrow"
 	configKeySetUsername     = "set.username"
 	configKeySetVacationDays = "set.vacation-days"
+	configKeySetYesterday    = "set.yesterday"
 
 	mtimeFormat   = "2006-01-02 15:04:05"
 	mtimeFormatTZ = "2006-01-02 15:04:05 MST"

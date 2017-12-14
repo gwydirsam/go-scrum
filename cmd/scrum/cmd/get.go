@@ -92,7 +92,7 @@ func init() {
 	{
 		const (
 			key          = configKeyGetUTC
-			longName     = "mtime-utc"
+			longName     = "utc"
 			shortName    = "Z"
 			defaultValue = false
 			description  = "Get mtime data in UTC"
@@ -100,6 +100,17 @@ func init() {
 
 		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
 		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key               = configKeyGetYesterday
+			longOpt, shortOpt = "yesterday", "y"
+			defaultValue      = false
+		)
+		getCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Get scrum for yesterday")
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -117,6 +128,10 @@ var getCmd = &cobra.Command{
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := checkRequiredFlags(cmd.Flags()); err != nil {
 			return errors.Wrap(err, "required flag missing")
+		}
+
+		if viper.GetBool(configKeyGetTomorrow) && viper.GetBool(configKeyGetYesterday) {
+			return errors.New("tomorrow and yesterday are conflicting optoins")
 		}
 
 		return nil
@@ -138,6 +153,8 @@ var getCmd = &cobra.Command{
 		switch {
 		case viper.GetBool(configKeyGetTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
+		case viper.GetBool(configKeyGetYesterday):
+			scrumDate = scrumDate.AddDate(0, 0, -1)
 		}
 
 		var w io.Writer

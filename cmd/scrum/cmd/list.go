@@ -20,10 +20,10 @@ func init() {
 	{
 		const (
 			key          = configKeyListUsersOne
-			longName     = "list-users-one"
+			longName     = "usernames"
 			shortName    = "1"
 			defaultValue = false
-			description  = "List no metadata"
+			description  = "List usernames only"
 		)
 
 		listCmd.Flags().BoolP(longName, shortName, defaultValue, description)
@@ -34,7 +34,7 @@ func init() {
 	{
 		const (
 			key          = configKeyListUsersAll
-			longName     = "list-users-all"
+			longName     = "all"
 			shortName    = "a"
 			defaultValue = true
 			description  = "List all metadata details"
@@ -61,22 +61,8 @@ func init() {
 
 	{
 		const (
-			key          = configKeyListUsers
-			longName     = "list-users"
-			shortName    = "L"
-			defaultValue = false
-			description  = "List usernames who scrummed for a given day"
-		)
-
-		listCmd.Flags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, listCmd.Flags().Lookup(longName))
-		viper.SetDefault(key, defaultValue)
-	}
-
-	{
-		const (
 			key               = configKeyListTomorrow
-			longOpt, shortOpt = key, "t"
+			longOpt, shortOpt = "tomorrow", "t"
 			defaultValue      = false
 		)
 		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrums for the next day")
@@ -87,7 +73,7 @@ func init() {
 	{
 		const (
 			key          = configKeyListUsersUTC
-			longName     = "mtime-utc"
+			longName     = "utc"
 			shortName    = "Z"
 			defaultValue = false
 			description  = "List mtime data in UTC"
@@ -95,6 +81,17 @@ func init() {
 
 		listCmd.Flags().BoolP(longName, shortName, defaultValue, description)
 		viper.BindPFlag(key, listCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key               = configKeyListYesterday
+			longOpt, shortOpt = "yesterday", "y"
+			defaultValue      = false
+		)
+		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrum for yesterday")
+		viper.BindPFlag(key, listCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -114,6 +111,10 @@ var listCmd = &cobra.Command{
 			return errors.Wrap(err, "required flag missing")
 		}
 
+		if viper.GetBool(configKeyListTomorrow) && viper.GetBool(configKeyListYesterday) {
+			return errors.New("tomorrow and yesterday are conflicting optoins")
+		}
+
 		return nil
 	},
 
@@ -131,6 +132,8 @@ var listCmd = &cobra.Command{
 		switch {
 		case viper.GetBool(configKeyListTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
+		case viper.GetBool(configKeyListYesterday):
+			scrumDate = scrumDate.AddDate(0, 0, -1)
 		}
 
 		return listScrummers(client, scrumDate)

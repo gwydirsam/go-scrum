@@ -23,10 +23,14 @@ var setCmd = &cobra.Command{
 	Long:         `Set scrum information, either for yourself (or teammates)`,
 	SilenceUsage: true,
 	Example: `  $ scrum set -i today.md                         # Set my scrum using today.md
-  $ scrum set -t -u other.username -i tomorrow.md # Set other.username's scrum for tomorrow`,
+  $ scrum set -u other.username -t -i tomorrow.md # Set other.username's scrum for tomorrow`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := checkRequiredFlags(cmd.Flags()); err != nil {
 			return errors.Wrap(err, "required flag missing")
+		}
+
+		if viper.GetBool(configKeySetTomorrow) && viper.GetBool(configKeySetYesterday) {
+			return errors.New("tomorrow and yesterday are conflicting optoins")
 		}
 
 		return nil
@@ -61,6 +65,8 @@ var setCmd = &cobra.Command{
 		switch {
 		case viper.GetBool(configKeySetTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
+		case viper.GetBool(configKeySetYesterday):
+			scrumDate = scrumDate.AddDate(0, 0, -1)
 		case numDays != 0:
 			scrumDate = scrumDate.AddDate(0, 0, numDays)
 		}
@@ -294,6 +300,20 @@ func init() {
 		setCmd.Flags().StringP(longName, shortName, defaultValue, description)
 		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
 		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key               = configKeySetYesterday
+			longOpt, shortOpt = "yesterday", "y"
+			defaultValue      = false
+		)
+		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for yesterday")
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
+
+		// I don't want to generally be advertising that this is available to do.
+		setCmd.Flags().MarkHidden(longOpt)
 	}
 
 	// Required Flags
