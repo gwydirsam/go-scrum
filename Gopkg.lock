@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/fatih/color"
+  packages = ["."]
+  revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
+  version = "v1.5.0"
+
+[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "629574ca2a5df945712d3079857300b5e4da0236"
@@ -29,7 +35,7 @@
   branch = "master"
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
-  revision = "7789d8fbf3114e3aca14b9ed7c6a104900d744b0"
+  revision = "282c896a4e55f6642c986c881124561ad367e3be"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -38,10 +44,22 @@
   version = "v1.7.3"
 
 [[projects]]
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
+  version = "v0.0.9"
+
+[[projects]]
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
   version = "v0.0.3"
+
+[[projects]]
+  name = "github.com/mattn/go-runewidth"
+  packages = ["."]
+  revision = "9e777a8366cce605130a531d2cd6363d07ad7317"
+  version = "v0.0.2"
 
 [[projects]]
   branch = "master"
@@ -54,6 +72,12 @@
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
   revision = "06020f85339e21b2478f756a78e295255ffa4d6a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/olekukonko/tablewriter"
+  packages = ["."]
+  revision = "65fec0d89a572b4367094e2058d3ebe667de3b60"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
@@ -118,20 +142,20 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["curve25519","ed25519","ed25519/internal/edwards25519","ssh","ssh/agent"]
+  packages = ["curve25519","ed25519","ed25519/internal/edwards25519","ssh","ssh/agent","ssh/terminal"]
   revision = "94eea52f7b742c7cbe0b03b22f0c4c8631ece122"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
-  revision = "53aa286056ef226755cd898109dbcdaba8ac0b81"
+  packages = ["unix","windows"]
+  revision = "1d2aa6dbdea45adaaebb9905d0666e4537563829"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
-  revision = "3b24cac7bc3a458991ab409aa2a339ac9e0d60d6"
+  revision = "c4d099d611ac3ded35360abf03581e13d91c828f"
 
 [[projects]]
   branch = "v2"
@@ -142,6 +166,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2557ae2f4852c2807aa0d749bd67dadbfd6faa236ef1a4cdfb138c3ac552773b"
+  inputs-digest = "e256f56609cbd6bf5db1fa99a4bbb97a8d7984abaf85fbaf18eb72bd7a4a0a5d"
   solver-name = "gps-cdcl"
   solver-version = 1

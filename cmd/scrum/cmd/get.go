@@ -2,24 +2,31 @@ package cmd
 
 import (
 	"bufio"
+	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 	"time"
 
+	"github.com/fatih/color"
+	"github.com/gwydirsam/go-scrum/pager"
 	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"github.com/ryanuber/columnize"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func init() {
 	{
 		const (
-			key          = configKeyGetOptAll
+			key          = configKeyGetAll
 			longName     = "all"
 			shortName    = "a"
 			defaultValue = false
@@ -68,13 +75,42 @@ func init() {
 		viper.SetDefault(key, defaultValue)
 	}
 
+	{
+		const (
+			key          = configKeyGetUsePager
+			longName     = "use-pager"
+			shortName    = "P"
+			defaultValue = true
+			description  = "Use a pager to read the output (defaults to $PAGER, less(1), or more(1))"
+		)
+
+		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key          = configKeyGetUTC
+			longName     = "mtime-utc"
+			shortName    = "Z"
+			defaultValue = false
+			description  = "Get mtime data in UTC"
+		)
+
+		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
 	rootCmd.AddCommand(getCmd)
 }
 
 var getCmd = &cobra.Command{
 	Use:          "get",
+	SuggestFor:   []string{"fetch", "pull"},
 	Short:        "Get scrum information",
-	Long:         `Get scrum information, either for yourself or teammates`,
+	Long:         `Get scrum information, either for yourself (or teammates)`,
 	SilenceUsage: true,
 	Example: `  $ scrum get                      # Get my scrum for today
   $ scrum get -t -u other.username # Get other.username's scrum for tomorrow`,
@@ -87,6 +123,8 @@ var getCmd = &cobra.Command{
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
+		color.NoColor = !viper.GetBool(configKeyLogTermColor)
+
 		client, err := getMantaClient()
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
@@ -102,18 +140,30 @@ var getCmd = &cobra.Command{
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
+		var w io.Writer
+		if viper.GetBool(configKeyGetUsePager) {
+			p, err := pager.New()
+			if err != nil {
+				return errors.Wrap(err, "unable to open pager")
+			}
+			defer pager.Wait()
+			w = p
+		} else {
+			w = os.Stdout
+		}
+
 		switch {
-		case viper.GetBool(configKeyGetOptAll):
-			return getAllScrum(client, scrumDate)
-		case !viper.GetBool(configKeyGetOptAll):
-			return getSingleScrum(os.Stdout, client, scrumDate, getUser(configKeyGetUsername))
+		case viper.GetBool(configKeyGetAll):
+			return getAllScrum(w, client, scrumDate)
+		case !viper.GetBool(configKeyGetAll):
+			return getSingleScrum(w, client, scrumDate, getUser(configKeyGetUsername), false)
 		default:
 			return errors.New("unsupported get mode")
 		}
 	},
 }
 
-func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
+func getAllScrum(unbufOut io.Writer, c *storage.StorageClient, scrumDate time.Time) error {
 	scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout))
 
 	dirEnts, err := c.Dir().List(context.Background(), &storage.ListDirectoryInput{
@@ -128,8 +178,17 @@ func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
 		return nil
 	}
 
-	w := bufio.NewWriter(os.Stdout)
+	w := bufio.NewWriter(unbufOut)
 	defer w.Flush()
+
+	const defaultTerminalWidth = 80
+	terminalWidth, _, err := terminal.GetSize(int(os.Stdin.Fd()))
+	if err != nil {
+		log.Warn().Err(err).Msg("unable to get terminal size, using default")
+		terminalWidth = defaultTerminalWidth
+	}
+
+	horizontalSeparator := strings.Repeat("-", terminalWidth) + "\n"
 
 	var firstError error
 	for _, ent := range dirEnts.Entries {
@@ -137,12 +196,21 @@ func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
 			continue
 		}
 
-		if err := getSingleScrum(w, c, scrumDate, ent.Name); err != nil {
+		w.WriteString(horizontalSeparator)
+
+		if err := getSingleScrum(w, c, scrumDate, ent.Name, true); err != nil {
 			log.Error().Err(err).Str("username", ent.Name).Msg("unable to get user's scrum")
 			if firstError == nil {
 				firstError = err
 			}
 		}
+
+		// Paper over slow object fetching in Manta and flush every entry in order
+		// to prevent tearing.
+		//
+		// TODO(seanc@): fetch entries in parallel, pipeline all requests, or figure
+		// out how to do a multi-GET.
+		w.Flush()
 	}
 
 	if firstError != nil {
@@ -152,23 +220,43 @@ func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
 	return nil
 }
 
-func getSingleScrum(w io.Writer, c *storage.StorageClient, scrumDate time.Time, user string) error {
+func getSingleScrum(w io.Writer, c *storage.StorageClient, scrumDate time.Time, user string, includeHeader bool) error {
 	objectPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), user)
 
-	output, err := c.Objects().Get(context.Background(), &storage.GetObjectInput{
+	obj, err := c.Objects().Get(context.Background(), &storage.GetObjectInput{
 		ObjectPath: objectPath,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to get manta object")
 	}
-	defer output.ObjectReader.Close()
+	defer obj.ObjectReader.Close()
 
-	body, err := ioutil.ReadAll(output.ObjectReader)
+	body, err := ioutil.ReadAll(obj.ObjectReader)
 	if err != nil {
 		return errors.Wrap(err, "unable to read manta object")
 	}
 
-	w.Write(body)
+	if includeHeader {
+		keyFmt := color.New(color.FgHiWhite, color.Bold).SprintFunc()
+		userFmt := color.New(color.FgHiWhite, color.Underline).SprintFunc()
+		mtimeFmt := color.New().SprintFunc()
+
+		var mtime time.Time
+		if viper.GetBool(configKeyGetUTC) {
+			mtime = obj.LastModified.UTC()
+		} else {
+			mtime = obj.LastModified.Local()
+		}
+
+		output := []string{
+			fmt.Sprintf("%s | %s", keyFmt("user"), userFmt(user)),
+			fmt.Sprintf("%s | %s", keyFmt("mtime"), mtimeFmt(mtime.Format(mtimeFormatTZ))),
+		}
+		w.Write([]byte(columnize.SimpleFormat(output) + "\n\n"))
+	}
+
+	w.Write(bytes.TrimSpace(body))
+	w.Write([]byte("\n"))
 
 	return nil
 }

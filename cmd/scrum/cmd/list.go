@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/joyent/triton-go/storage"
+	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/ryanuber/columnize"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -103,7 +103,7 @@ func init() {
 
 var listCmd = &cobra.Command{
 	Use:          "list",
-	Aliases:      []string{"ls", "dir"},
+	SuggestFor:   []string{"ls", "dir"},
 	Short:        "List scrum information",
 	Long:         `List scrum information for the day`,
 	SilenceUsage: true,
@@ -175,11 +175,29 @@ func listScrummers(c *storage.StorageClient, scrumDate time.Time) error {
 			tz, _ = scrumDate.Local().Zone()
 		}
 
-		output := make([]string, 0, dirEnts.ResultSetSize+1)
-		output = append(output, fmt.Sprintf(" name | size | mtime (%s)", tz))
+		table := tablewriter.NewWriter(w)
+		table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+		table.SetHeaderLine(false)
+		table.SetAutoFormatHeaders(true)
 
-		const mtimeFormat = "2006/01/02 15:04:05"
+		table.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_RIGHT})
+		table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+		table.SetCenterSeparator("")
+		table.SetColumnSeparator("")
+		table.SetRowSeparator("")
 
+		table.SetHeader([]string{"name", "size", fmt.Sprintf("mtime (%s)", tz)})
+		if viper.GetBool(configKeyLogTermColor) {
+			table.SetHeaderColor(
+				tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiWhiteColor},
+				tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiWhiteColor},
+				tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiWhiteColor},
+			)
+		}
+
+		const mtimeFormat = "2006-01-02 15:04:05"
+
+		var numScrum uint
 		for _, ent := range dirEnts.Entries {
 			if v, found := usernameActionMap[ent.Name]; found && v == _Ignore {
 				continue
@@ -190,11 +208,12 @@ func listScrummers(c *storage.StorageClient, scrumDate time.Time) error {
 				mtime = mtime.Local()
 			}
 
-			l := fmt.Sprintf("%s | %d | %s", ent.Name, ent.Size, mtime.Format(mtimeFormat))
-			output = append(output, l)
+			table.Append([]string{ent.Name, fmt.Sprintf("%d", ent.Size), mtime.Format(mtimeFormat)})
+			numScrum++
 		}
+		table.SetFooter([]string{"Total", fmt.Sprintf("%d", numScrum), ""})
 
-		fmt.Fprintln(w, columnize.SimpleFormat(output))
+		table.Render()
 
 		return nil
 	default:

@@ -3,9 +3,11 @@ package cmd
 const (
 	dateInputFormat = "2006-01-02"
 
+	configKeyGetAll       = "get.all"
 	configKeyGetInputDate = "get.date"
-	configKeyGetOptAll    = "get.opt-all"
 	configKeyGetTomorrow  = "get.tomorrow"
+	configKeyGetUTC       = "get.utc"
+	configKeyGetUsePager  = "get.use-pager"
 	configKeyGetUsername  = "get.username"
 
 	configKeyInitFilename = "init.config-file"
@@ -34,6 +36,9 @@ const (
 	configKeySetTomorrow     = "set.tomorrow"
 	configKeySetUsername     = "set.username"
 	configKeySetVacationDays = "set.vacation-days"
+
+	mtimeFormat   = "2006-01-02 15:04:05"
+	mtimeFormatTZ = "2006-01-02 15:04:05 MST"
 
 	scrumDateLayout = "2006/01/02"
 )
