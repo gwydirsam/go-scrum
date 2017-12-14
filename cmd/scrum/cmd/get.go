@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -73,6 +74,20 @@ func init() {
 		viper.SetDefault(key, defaultValue)
 	}
 
+	{
+		const (
+			key          = configKeyGetUTC
+			longName     = "mtime-utc"
+			shortName    = "Z"
+			defaultValue = false
+			description  = "Get mtime data in UTC"
+		)
+
+		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
 	rootCmd.AddCommand(getCmd)
 }
 
@@ -92,6 +107,8 @@ var getCmd = &cobra.Command{
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
+		color.NoColor = !viper.GetBool(configKeyLogTermColor)
+
 		client, err := getMantaClient()
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
@@ -106,8 +123,6 @@ var getCmd = &cobra.Command{
 		case viper.GetBool(configKeyGetTomorrow):
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
-
-		color.NoColor = !viper.GetBool(configKeyLogTermColor)
 
 		switch {
 		case viper.GetBool(configKeyGetOptAll):
@@ -187,17 +202,26 @@ func getSingleScrum(w io.Writer, c *storage.StorageClient, scrumDate time.Time, 
 	}
 
 	if includeHeader {
-		key := color.New(color.Bold, color.FgWhite).SprintFunc()
-		value := color.New(color.FgWhite, color.Underline).SprintFunc()
+		keyFmt := color.New(color.FgHiWhite, color.Bold).SprintFunc()
+		userFmt := color.New(color.FgHiWhite, color.Underline).SprintFunc()
+		mtimeFmt := color.New().SprintFunc()
+
+		var mtime time.Time
+		if viper.GetBool(configKeyGetUTC) {
+			mtime = obj.LastModified.UTC()
+		} else {
+			mtime = obj.LastModified.Local()
+		}
 
 		output := []string{
-			fmt.Sprintf("%s | %s", key("user"), value(user)),
-			fmt.Sprintf("%s | %s", key("mtime"), value(obj.LastModified.Local().String())),
+			fmt.Sprintf("%s | %s", keyFmt("user"), userFmt(user)),
+			fmt.Sprintf("%s | %s", keyFmt("mtime"), mtimeFmt(mtime.Format(mtimeFormatTZ))),
 		}
 		w.Write([]byte(columnize.SimpleFormat(output) + "\n\n"))
 	}
 
-	w.Write(body)
+	w.Write(bytes.TrimSpace(body))
+	w.Write([]byte("\n"))
 
 	return nil
 }
