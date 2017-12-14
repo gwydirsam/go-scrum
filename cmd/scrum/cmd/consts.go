@@ -3,11 +3,12 @@ package cmd
 const (
 	dateInputFormat = "2006-01-02"
 
+	configKeyGetAll       = "get.all"
 	configKeyGetInputDate = "get.date"
-	configKeyGetOptAll    = "get.opt-all"
 	configKeyGetTomorrow  = "get.tomorrow"
+	configKeyGetUTC       = "get.utc"
+	configKeyGetUsePager  = "get.use-pager"
 	configKeyGetUsername  = "get.username"
-	configKeyGetUTC       = "get.opt-utc"
 
 	configKeyInitFilename = "init.config-file"
 

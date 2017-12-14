@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/gwydirsam/go-scrum/pager"
 	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -25,7 +26,7 @@ import (
 func init() {
 	{
 		const (
-			key          = configKeyGetOptAll
+			key          = configKeyGetAll
 			longName     = "all"
 			shortName    = "a"
 			defaultValue = false
@@ -71,6 +72,20 @@ func init() {
 		getCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "Get scrum for specified user")
 		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
 		viper.BindEnv(key, "USER")
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key          = configKeyGetUsePager
+			longName     = "use-pager"
+			shortName    = "P"
+			defaultValue = true
+			description  = "Use a pager to read the output (defaults to $PAGER, less(1), or more(1))"
+		)
+
+		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -125,18 +140,30 @@ var getCmd = &cobra.Command{
 			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
+		var w io.Writer
+		if viper.GetBool(configKeyGetUsePager) {
+			p, err := pager.New()
+			if err != nil {
+				return errors.Wrap(err, "unable to open pager")
+			}
+			defer pager.Wait()
+			w = p
+		} else {
+			w = os.Stdout
+		}
+
 		switch {
-		case viper.GetBool(configKeyGetOptAll):
-			return getAllScrum(client, scrumDate)
-		case !viper.GetBool(configKeyGetOptAll):
-			return getSingleScrum(os.Stdout, client, scrumDate, getUser(configKeyGetUsername), false)
+		case viper.GetBool(configKeyGetAll):
+			return getAllScrum(w, client, scrumDate)
+		case !viper.GetBool(configKeyGetAll):
+			return getSingleScrum(w, client, scrumDate, getUser(configKeyGetUsername), false)
 		default:
 			return errors.New("unsupported get mode")
 		}
 	},
 }
 
-func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
+func getAllScrum(unbufOut io.Writer, c *storage.StorageClient, scrumDate time.Time) error {
 	scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout))
 
 	dirEnts, err := c.Dir().List(context.Background(), &storage.ListDirectoryInput{
@@ -151,7 +178,7 @@ func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
 		return nil
 	}
 
-	w := bufio.NewWriter(os.Stdout)
+	w := bufio.NewWriter(unbufOut)
 	defer w.Flush()
 
 	const defaultTerminalWidth = 80
@@ -177,6 +204,13 @@ func getAllScrum(c *storage.StorageClient, scrumDate time.Time) error {
 				firstError = err
 			}
 		}
+
+		// Paper over slow object fetching in Manta and flush every entry in order
+		// to prevent tearing.
+		//
+		// TODO(seanc@): fetch entries in parallel, pipeline all requests, or figure
+		// out how to do a multi-GET.
+		w.Flush()
 	}
 
 	if firstError != nil {
