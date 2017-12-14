@@ -18,8 +18,9 @@ import (
 
 var setCmd = &cobra.Command{
 	Use:          "set",
+	SuggestFor:   []string{"push", "put"},
 	Short:        "Set scrum information",
-	Long:         `Set scrum information, either for yourself or teammates`,
+	Long:         `Set scrum information, either for yourself (or teammates)`,
 	SilenceUsage: true,
 	Example: `  $ scrum set -i today.md                         # Set my scrum using today.md
   $ scrum set -t -u other.username -i tomorrow.md # Set other.username's scrum for tomorrow`,

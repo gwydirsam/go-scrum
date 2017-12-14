@@ -103,7 +103,7 @@ func init() {
 
 var listCmd = &cobra.Command{
 	Use:          "list",
-	Aliases:      []string{"ls", "dir"},
+	SuggestFor:   []string{"ls", "dir"},
 	Short:        "List scrum information",
 	Long:         `List scrum information for the day`,
 	SilenceUsage: true,

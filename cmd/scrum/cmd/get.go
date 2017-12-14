@@ -93,8 +93,9 @@ func init() {
 
 var getCmd = &cobra.Command{
 	Use:          "get",
+	SuggestFor:   []string{"fetch", "pull"},
 	Short:        "Get scrum information",
-	Long:         `Get scrum information, either for yourself or teammates`,
+	Long:         `Get scrum information, either for yourself (or teammates)`,
 	SilenceUsage: true,
 	Example: `  $ scrum get                      # Get my scrum for today
   $ scrum get -t -u other.username # Get other.username's scrum for tomorrow`,
