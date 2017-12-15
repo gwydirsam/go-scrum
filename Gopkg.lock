@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
-  revision = "f2632ff70f3e6c290821fd2d2543c70c3e4d93cf"
+  revision = "4ce3c397b2b8d06dee6ecd2eb1700760ee83bd7a"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -155,7 +155,7 @@
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
-  revision = "73f72487b7d8a81970fbf571cd9b660d3d5e604c"
+  revision = "d5a9226ed7dd70cade6ccae9d37517fe14dd9fee"
 
 [[projects]]
   branch = "v2"

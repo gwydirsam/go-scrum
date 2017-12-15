@@ -1,6 +1,13 @@
 ## Unreleased
 
+## 0.4.1 (December 15)
+
+- Clean up the handling of directory sanitization. Use abs paths everywhere [#79]
+
+## 0.4.0 (December 15)
+
 - Fix an issue where Manta HEAD requests do not return an error resp body [#77]
+- Add support for recursively creating child directories [#78]
 
 ## 0.3.0 (December 14)
 
