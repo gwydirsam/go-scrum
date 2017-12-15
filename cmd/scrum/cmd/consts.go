@@ -36,6 +36,7 @@ const (
 	configKeySetNumDays      = "set.num-days"
 	configKeySetSickDays     = "set.sick-days"
 	configKeySetTomorrow     = "set.tomorrow"
+	configKeySetUnlinkDay    = "set.unlink-day"
 	configKeySetUsername     = "set.username"
 	configKeySetVacationDays = "set.vacation-days"
 	configKeySetYesterday    = "set.yesterday"

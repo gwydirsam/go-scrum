@@ -123,7 +123,7 @@ func init() {
 	// Initialize viper so that when ew call initLogLevels() we can pull a value
 	// from a config file.
 	viper.SetConfigName(buildtime.PROGNAME)
-	viper.AddConfigPath(path.Join("~/", ".config", buildtime.PROGNAME))
+	viper.AddConfigPath(path.Join("$HOME", ".config", buildtime.PROGNAME))
 	viper.AddConfigPath(".")
 
 	// os.Stderr isn't guaranteed to be thread-safe, wrap in a sync writer.  Files

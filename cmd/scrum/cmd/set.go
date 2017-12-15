@@ -47,42 +47,43 @@ var setCmd = &cobra.Command{
 		//if result.String() == "" {
 		//	log.Fatalf("Expected Engineer")
 		//}
-
 		c, err := getMantaClient()
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
 
 		numDays := viper.GetInt(configKeySetNumDays)
+		if numDays < 1 {
+			numDays = 1
+		}
+
 		numSick := viper.GetInt(configKeySetSickDays)
 		numVacation := viper.GetInt(configKeySetVacationDays)
 
 		// Build file string
-		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeySetInputDate))
+		inputScrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeySetInputDate))
 		if err != nil {
 			return errors.Wrap(err, "unable to parse date")
 		}
 
 		switch {
 		case viper.GetBool(configKeySetTomorrow):
-			scrumDate = scrumDate.AddDate(0, 0, 1)
+			inputScrumDate = inputScrumDate.AddDate(0, 0, 1)
 		case viper.GetBool(configKeySetYesterday):
-			scrumDate = scrumDate.AddDate(0, 0, -1)
-		case numDays != 0:
-			scrumDate = scrumDate.AddDate(0, 0, numDays)
+			inputScrumDate = inputScrumDate.AddDate(0, 0, -1)
 		}
 
 		// create end date string for vacation and sick time
-		endDate := scrumDate
-		daysToScrum := 1
+		endDate := inputScrumDate
 		if numSick > 0 || numVacation > 0 {
-			daysToScrum = max(numSick, numVacation)
-			endDate = endDate.AddDate(0, 0, daysToScrum)
+			endDate = endDate.AddDate(0, 0, max(numSick, numVacation))
 		}
 
 		var foundError bool
 	DAY_HANDLING:
-		for i := daysToScrum; i > 0; i-- {
+		for i := 0; i < numDays; i++ {
+			scrumDate := inputScrumDate.AddDate(0, 0, i)
+
 			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeySetUsername))
 
 			// Check if scrum exists
@@ -92,56 +93,50 @@ var setCmd = &cobra.Command{
 
 		ERROR_HANDLING:
 			switch {
-			case err != nil && client.IsDirectoryDoesNotExistError(err):
-				dirs := strings.Split(scrumDate.Format(scrumDateLayout), "/")
-				scrumDir := make([]string, 0, len(dirs)+1)
-				scrumDir = append(scrumDir, "scrum")
-
-				// Unconditionally attempt to create all directories in the path
-				for _, dir := range dirs {
-					scrumDir = append(scrumDir, dir)
-					err = c.Dir().Put(context.TODO(), &storage.PutDirectoryInput{
-						DirectoryName: path.Join(scrumDir...),
-					})
-					if err != nil {
-						return errors.Wrap(err, "unable to put object")
-					}
-				}
+			case err != nil && client.IsResourceNotFoundError(err):
+				// User data doesn't exist
+				break ERROR_HANDLING
 			case err != nil && !client.IsResourceNotFoundError(err):
+				return errors.Wrap(err, "unknown error")
+			case err == nil:
+				// User data does exist
+
+				// The semantic of "setting a DELETE" operation bugs me, but I don't
+				// want to expose a top-level command to delete my user file.
+				if viper.GetBool(configKeySetUnlinkDay) {
+					if err := unlinkObject(c, scrumPath); err != nil {
+						return errors.Wrap(err, "unable to unlink object")
+					}
+
+					continue DAY_HANDLING
+				}
+
 				if viper.GetBool(configKeySetForce) {
 					// If we're overriding multiple days, increase the verbosity of the
 					// log messages (vs the common case, overriding just today, in which
 					// case we just use the DEBUG level).
-					if daysToScrum > 1 {
+					if numDays > 1 {
 						log.Info().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("replacing scrum")
 					} else {
 						log.Debug().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("replacing scrum")
 					}
 
 					break ERROR_HANDLING
-				}
-
-				if daysToScrum == 1 {
-					log.Error().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("scrum exists, not replacing scrum without -f to override")
-					return errors.Wrap(err, "scrum already exists")
-				}
-
-				// Let users attempt to stamp out scrum for multiple days and skip over
-				// days that already exist.  Return an error just to let the user know
-				// that the command did run into a potential problem (i.e. don't return
-				// cleanly).
-				foundError = true
-				log.Info().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("replacing scrum")
-
-				continue DAY_HANDLING
-			case err == nil:
-				if viper.GetBool(configKeySetForce) {
-					log.Debug().Str("path", scrumPath).Msg("scrum already exists, overriding")
-					break ERROR_HANDLING
 				} else {
-					log.Warn().Str("path", scrumPath).Msg("scrum already exists, specify -f to override")
+					if numDays == 1 {
+						log.Error().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("scrum exists, not replacing scrum without -f to override")
+						return errors.Wrap(err, "scrum already exists")
+					}
+
+					// Let users attempt to stamp out scrum for multiple days and skip over
+					// days that already exist.  Return an error just to let the user know
+					// that the command did run into a potential problem (i.e. don't return
+					// cleanly).
+					foundError = true
+					log.Info().Str("path", scrumPath).Bool("force", viper.GetBool(configKeySetForce)).Msg("replacing scrum")
+
+					continue DAY_HANDLING
 				}
-				continue DAY_HANDLING
 			}
 
 			var reader io.Reader
@@ -178,11 +173,8 @@ var setCmd = &cobra.Command{
 			}
 
 			if err := putObject(c, scrumPath, reader); err != nil {
-				return errors.Wrap(err, "unable to put object")
+				return errors.Wrapf(err, "unable to put object: %q", scrumPath)
 			}
-
-			// scrum for next day
-			scrumDate = scrumDate.AddDate(0, 0, 1)
 		}
 
 		if foundError {
@@ -313,7 +305,21 @@ func init() {
 		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 
-		// I don't want to generally be advertising that this is available to do.
+		// I don't want to generally be advertising that this is available.
+		setCmd.Flags().MarkHidden(longOpt)
+	}
+
+	{
+		const (
+			key          = configKeySetUnlinkDay
+			longOpt      = "rm"
+			defaultValue = false
+		)
+		setCmd.Flags().Bool(longOpt, defaultValue, "Remove scrum for a given day")
+		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
+
+		// I don't want to generally be advertising that this is available.
 		setCmd.Flags().MarkHidden(longOpt)
 	}
 
@@ -332,6 +338,7 @@ func putObject(c *storage.StorageClient, scrumPath string, reader io.Reader) err
 	putInput := &storage.PutObjectInput{
 		ObjectPath:   scrumPath,
 		ObjectReader: reader,
+		ForceInsert:  true,
 	}
 
 	if err := c.Objects().Put(context.TODO(), putInput); err != nil {
@@ -339,6 +346,20 @@ func putObject(c *storage.StorageClient, scrumPath string, reader io.Reader) err
 	}
 
 	log.Info().Str("path", scrumPath).Msg("scrummed")
+
+	return nil
+}
+
+func unlinkObject(c *storage.StorageClient, scrumPath string) error {
+	deleteInput := &storage.DeleteObjectInput{
+		ObjectPath: scrumPath,
+	}
+
+	if err := c.Objects().Delete(context.TODO(), deleteInput); err != nil {
+		return errors.Wrap(err, "unable to delete object")
+	}
+
+	log.Info().Str("path", scrumPath).Msg("removed scrum file")
 
 	return nil
 }
