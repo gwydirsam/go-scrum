@@ -35,13 +35,13 @@
   branch = "master"
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
-  revision = "282c896a4e55f6642c986c881124561ad367e3be"
+  revision = "f2632ff70f3e6c290821fd2d2543c70c3e4d93cf"
 
 [[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
-  revision = "be5ece7dd465ab0765a9682137865547526d1dfb"
-  version = "v1.7.3"
+  revision = "d419a98cdbed11a922bf76f257b7c4be79b50e73"
+  version = "v1.7.4"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -149,13 +149,13 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "1d2aa6dbdea45adaaebb9905d0666e4537563829"
+  revision = "d5840adf789d732bc8b00f37b26ca956a7cc8e79"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
-  revision = "c4d099d611ac3ded35360abf03581e13d91c828f"
+  revision = "73f72487b7d8a81970fbf571cd9b660d3d5e604c"
 
 [[projects]]
   branch = "v2"

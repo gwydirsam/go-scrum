@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Fix an issue where Manta HEAD requests do not return an error resp body [#77]
+
+## 0.3.0 (December 14)
+
 - Introduce CloudAPI's ListRulesMachines under networking
 - Enable HTTP KeepAlives by default in the client.  15s idle timeout, 2x
   connections per host, total of 10x connections per client.
@@ -9,6 +13,7 @@
 - Inputs to Object inputs have been relaxed to `io.Reader` (formerly a
   `io.ReadSeeker`) [#73](https://github.com/joyent/issues/73).
 - Add support for ForceDelete of all children of a directory [#71](https://github.com/joyent/issues/71)
+- storage: Introduce `Objects.GetInfo` and `Objects.IsDir` using HEAD requests [#74](https://github.com/joyent/triton-go/issues/74)
 
 ## 0.2.1 (November 8)
 
