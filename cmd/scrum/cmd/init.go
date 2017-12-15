@@ -22,6 +22,7 @@ var initCmd = &cobra.Command{
 	Example: `  $ scrum init                 # Create a new scrum config file
   $ scrum init -f -            # Write the config file to stdout
   $ scrum init -f ./scrum.toml # Create a new scrum config file`,
+	Args: cobra.NoArgs,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// 1) Create a b file

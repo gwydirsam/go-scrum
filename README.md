@@ -36,6 +36,12 @@ scrum is used internally to post and read the daily scrum at Joyent.
 Usage:
   scrum [command]
 
+Examples:
+  $ scrum get             # Get my scrum for today
+  $ scrum get -a          # Get everyone's scrum
+  $ scrum set -i today.md # Set my scrum using today.md
+  $ scrum list            # List scrummers for the day
+
 Available Commands:
   get         Get scrum information
   help        Help about any command

@@ -28,15 +28,11 @@ var rootCmd = &cobra.Command{
 	SilenceErrors: true,
 	Short:         "A command to post and read scrums",
 	Long:          `scrum is used internally to post and read the daily scrum at Joyent.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Printf("MANTA_URL: %s\n", viper.Get("manta_url"))
-	// 	mantaURL = viper.Get("manta_url").(string)
-	// 	fmt.Printf("MANTA_KEY_ID: %s\n", viper.Get("manta_key_id"))
-	// 	mantaURL = viper.Get("manta_key_id").(string)
-	// },
-
+	Example: `  $ scrum get             # Get my scrum for today
+  $ scrum get -a          # Get everyone's scrum
+  $ scrum set -i today.md # Set my scrum using today.md
+  $ scrum list            # List scrummers for the day`,
+	Args: cobra.NoArgs,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Perform input validation
 

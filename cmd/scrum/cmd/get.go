@@ -125,6 +125,7 @@ var getCmd = &cobra.Command{
 	SilenceUsage: true,
 	Example: `  $ scrum get                      # Get my scrum for today
   $ scrum get -t -u other.username # Get other.username's scrum for tomorrow`,
+	Args: cobra.NoArgs,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := checkRequiredFlags(cmd.Flags()); err != nil {
 			return errors.Wrap(err, "required flag missing")

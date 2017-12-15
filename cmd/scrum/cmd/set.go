@@ -24,6 +24,7 @@ var setCmd = &cobra.Command{
 	SilenceUsage: true,
 	Example: `  $ scrum set -i today.md                         # Set my scrum using today.md
   $ scrum set -u other.username -t -i tomorrow.md # Set other.username's scrum for tomorrow`,
+	Args: cobra.NoArgs,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := checkRequiredFlags(cmd.Flags()); err != nil {
 			return errors.Wrap(err, "required flag missing")
