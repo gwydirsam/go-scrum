@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
-  revision = "4ce3c397b2b8d06dee6ecd2eb1700760ee83bd7a"
+  revision = "86ba9699869b6cd5ea3290faad7be659efc7d6ce"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -106,8 +106,8 @@
 [[projects]]
   name = "github.com/spf13/afero"
   packages = [".","mem"]
-  revision = "8d919cbe7e2627e417f3e45c3c0e489a5b7e2536"
-  version = "v1.0.0"
+  revision = "ec3a3111d1e1bdff38a61e09d5a5f5e974905611"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -137,25 +137,25 @@
   branch = "master"
   name = "github.com/spf13/viper"
   packages = ["."]
-  revision = "1a0c4a370c3e8286b835467d2dfcdaf636c3538b"
+  revision = "aafc9e6bc7b7bb53ddaa75a5ef49a17d6e654be5"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["curve25519","ed25519","ed25519/internal/edwards25519","ssh","ssh/agent","ssh/terminal"]
-  revision = "94eea52f7b742c7cbe0b03b22f0c4c8631ece122"
+  revision = "95a4943f35d008beabde8c11e5075a1b714e6419"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "d5840adf789d732bc8b00f37b26ca956a7cc8e79"
+  revision = "83801418e1b59fb1880e363299581ee543af32ca"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
-  revision = "d5a9226ed7dd70cade6ccae9d37517fe14dd9fee"
+  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [[projects]]
   branch = "v2"
