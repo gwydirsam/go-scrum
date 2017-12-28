@@ -14,10 +14,12 @@ import (
 func getMantaClient() (*storage.StorageClient, error) {
 	mantaAccount := viper.GetString(configKeyMantaAccount)
 	mantaURL := viper.GetString(configKeyMantaURL)
-	mantaKeyID := viper.GetString(configKeyMantaKeyID)
 
-	sshKeySigner, err := authentication.NewSSHAgentSigner(
-		mantaKeyID, mantaAccount)
+	input := authentication.SSHAgentSignerInput{
+		KeyID:       viper.GetString(configKeyMantaKeyID),
+		AccountName: mantaAccount,
+	}
+	sshKeySigner, err := authentication.NewSSHAgentSigner(input)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create new SSH agent signer")
 	}
