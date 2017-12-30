@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/gops/agent"
 	"github.com/gwydirsam/go-scrum/cmd/scrum/buildtime"
 	isatty "github.com/mattn/go-isatty"
 	"github.com/pkg/errors"
@@ -91,6 +92,11 @@ var rootCmd = &cobra.Command{
 			} else {
 				stdLogger.SetOutput(zlog)
 			}
+		}
+
+		// Always enable the agent
+		if err := agent.Listen(nil); err != nil {
+			log.Fatal().Err(err).Msg("unable to start gops agent")
 		}
 
 		return nil
