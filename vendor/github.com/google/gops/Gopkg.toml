@@ -1,3 +1,6 @@
+
+# Gopkg.toml example
+#
 # Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
 # for detailed Gopkg.toml documentation.
 #
@@ -17,23 +20,15 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
-[[constraint]]
-  branch = "gh-7-and-8"
-  name = "github.com/circonus-labs/circonusllhist"
-  source = "github.com/sean-/circonusllhist"
 
 [[constraint]]
   branch = "master"
-  name = "github.com/joyent/triton-go"
+  name = "github.com/kardianos/osext"
 
 [[constraint]]
   branch = "master"
-  name = "github.com/mitchellh/go-homedir"
+  name = "github.com/keybase/go-ps"
 
 [[constraint]]
   branch = "master"
-  name = "github.com/spf13/cobra"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/spf13/viper"
+  name = "golang.org/x/arch"

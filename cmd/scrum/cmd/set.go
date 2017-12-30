@@ -47,10 +47,11 @@ var setCmd = &cobra.Command{
 		//if result.String() == "" {
 		//	log.Fatalf("Expected Engineer")
 		//}
-		c, err := getMantaClient()
+		c, err := getScrumClient()
 		if err != nil {
-			return errors.Wrap(err, "unable to create a new manta client")
+			return errors.Wrap(err, "unable to create a new scrum client")
 		}
+		defer c.dumpMantaClientStats()
 
 		numDays := viper.GetInt(configKeySetNumDays)
 		if numDays < 1 {
@@ -87,9 +88,14 @@ var setCmd = &cobra.Command{
 			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeySetUsername))
 
 			// Check if scrum exists
-			_, err = c.Objects().Get(context.TODO(), &storage.GetObjectInput{
+			ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
+			start := time.Now().UnixNano()
+			_, err = c.Objects().Get(ctx, &storage.GetObjectInput{
 				ObjectPath: scrumPath,
 			})
+			elapsed := time.Now().UnixNano() - start
+			c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
+			c.getCalls++
 
 		ERROR_HANDLING:
 			switch {
@@ -334,14 +340,20 @@ func max(a, b int) int {
 	return a
 }
 
-func putObject(c *storage.StorageClient, scrumPath string, reader io.Reader) error {
+func putObject(c *scrumClient, scrumPath string, reader io.Reader) error {
 	putInput := &storage.PutObjectInput{
 		ObjectPath:   scrumPath,
 		ObjectReader: reader,
 		ForceInsert:  true,
 	}
 
-	if err := c.Objects().Put(context.TODO(), putInput); err != nil {
+	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
+	defer func(start int64) {
+		elapsed := time.Now().UnixNano() - start
+		c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
+		c.putCalls++
+	}(time.Now().UnixNano())
+	if err := c.Objects().Put(ctx, putInput); err != nil {
 		return errors.Wrap(err, "unable to put object")
 	}
 
@@ -350,14 +362,19 @@ func putObject(c *storage.StorageClient, scrumPath string, reader io.Reader) err
 	return nil
 }
 
-func unlinkObject(c *storage.StorageClient, scrumPath string) error {
+func unlinkObject(c *scrumClient, scrumPath string) error {
 	deleteInput := &storage.DeleteObjectInput{
 		ObjectPath: scrumPath,
 	}
 
-	if err := c.Objects().Delete(context.TODO(), deleteInput); err != nil {
+	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
+	start := time.Now().UnixNano()
+	if err := c.Objects().Delete(ctx, deleteInput); err != nil {
 		return errors.Wrap(err, "unable to delete object")
 	}
+	elapsed := time.Now().UnixNano() - start
+	c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
+	c.deleteCalls++
 
 	log.Info().Str("path", scrumPath).Msg("removed scrum file")
 

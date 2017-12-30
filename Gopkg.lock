@@ -2,6 +2,13 @@
 
 
 [[projects]]
+  branch = "gh-7-and-8"
+  name = "github.com/circonus-labs/circonusllhist"
+  packages = ["."]
+  revision = "c35495bb77c15b38863d0c6d113df106c5e2a2a5"
+  source = "github.com/sean-/circonusllhist"
+
+[[projects]]
   name = "github.com/deckarep/golang-set"
   packages = ["."]
   revision = "1d4478f51bed434f1dadf96dcd9b43aabac66795"
@@ -18,6 +25,12 @@
   packages = ["."]
   revision = "629574ca2a5df945712d3079857300b5e4da0236"
   version = "v1.4.2"
+
+[[projects]]
+  name = "github.com/google/gops"
+  packages = ["agent","internal","signal"]
+  revision = "57e77c5c37da1f4e1af49f9d1fe760f146c1579e"
+  version = "v0.3.2"
 
 [[projects]]
   branch = "master"
@@ -42,6 +55,12 @@
   name = "github.com/joyent/triton-go"
   packages = [".","authentication","client","storage"]
   revision = "86ba9699869b6cd5ea3290faad7be659efc7d6ce"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kardianos/osext"
+  packages = ["."]
+  revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -178,6 +197,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "afa60b224b1dd84b3567bb2365de889fd2dee9e63f7b5f9278096d40a3139dfc"
+  inputs-digest = "1e158f00be108c0849a0d655d0404925b48d8612dbd7679da249751cf1f83372"
   solver-name = "gps-cdcl"
   solver-version = 1

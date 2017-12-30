@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"os"
+	"time"
 
+	"github.com/circonus-labs/circonusllhist"
 	triton "github.com/joyent/triton-go"
 	"github.com/joyent/triton-go/authentication"
 	"github.com/joyent/triton-go/storage"
@@ -11,7 +13,39 @@ import (
 	"github.com/spf13/viper"
 )
 
-func getMantaClient() (*storage.StorageClient, error) {
+// scrumClient wraps a StorateClient and a Histogram
+type scrumClient struct {
+	*storage.StorageClient
+
+	// Time per operation (us)
+	*circonusllhist.Histogram
+
+	// Count of each operation type
+	deleteCalls uint64
+	getCalls    uint64
+	listCalls   uint64
+	putCalls    uint64
+}
+
+func (sc *scrumClient) dumpMantaClientStats() {
+	if !viper.GetBool(configKeyLogStats) {
+		return
+	}
+
+	log.Info().
+		Str("tp99", (time.Duration(sc.Histogram.ValueAtQuantile(0.99)*float64(time.Second))).String()).
+		Str("tp95", (time.Duration(sc.Histogram.ValueAtQuantile(0.95)*float64(time.Second))).String()).
+		Str("tp90", (time.Duration(sc.Histogram.ValueAtQuantile(0.90)*float64(time.Second))).String()).
+		Str("max", (time.Duration(sc.Histogram.Max()*float64(time.Second))).String()).
+		Str("mean", (time.Duration(sc.Histogram.Mean()*float64(time.Second))).String()).
+		Str("min", (time.Duration(sc.Histogram.Min()*float64(time.Second))).String()).
+		Uint64("get-calls", sc.getCalls).
+		Uint64("list-calls", sc.listCalls).
+		Uint64("put-calls", sc.putCalls).
+		Msg("stats")
+}
+
+func getScrumClient() (*scrumClient, error) {
 	mantaAccount := viper.GetString(configKeyMantaAccount)
 	mantaURL := viper.GetString(configKeyMantaURL)
 
@@ -24,7 +58,7 @@ func getMantaClient() (*storage.StorageClient, error) {
 		return nil, errors.Wrap(err, "unable to create new SSH agent signer")
 	}
 
-	c, err := storage.NewClient(&triton.ClientConfig{
+	tsc, err := storage.NewClient(&triton.ClientConfig{
 		MantaURL:    mantaURL,
 		AccountName: mantaAccount,
 		Signers:     []authentication.Signer{sshKeySigner},
@@ -33,7 +67,10 @@ func getMantaClient() (*storage.StorageClient, error) {
 		return nil, errors.Wrap(err, "unable to create a new manta client")
 	}
 
-	return c, nil
+	return &scrumClient{
+		StorageClient: tsc,
+		Histogram:     circonusllhist.New(),
+	}, nil
 }
 
 func getUser(userKey string) string {

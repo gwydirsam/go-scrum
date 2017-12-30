@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/gops/agent"
 	"github.com/gwydirsam/go-scrum/cmd/scrum/buildtime"
 	isatty "github.com/mattn/go-isatty"
 	"github.com/pkg/errors"
@@ -91,6 +92,11 @@ var rootCmd = &cobra.Command{
 			} else {
 				stdLogger.SetOutput(zlog)
 			}
+		}
+
+		// Always enable the agent
+		if err := agent.Listen(nil); err != nil {
+			log.Fatal().Err(err).Msg("unable to start gops agent")
 		}
 
 		return nil
@@ -178,6 +184,18 @@ func init() {
 
 	{
 		const (
+			key               = configKeyLogStats
+			longOpt, shortOpt = "stats", "s"
+			defaultValue      = true
+			description       = "Log Manta client latency stats on exit"
+		)
+		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
 			key         = configKeyLogTermColor
 			longOpt     = "use-color"
 			shortOpt    = ""
@@ -210,6 +228,20 @@ func init() {
 		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "SSH key fingerprint (default is $MANTA_KEY_ID)")
 		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_KEY_ID")
+	}
+
+	{
+		const (
+			key          = configKeyMantaTimeout
+			longOpt      = "manta-timeout"
+			shortOpt     = "T"
+			description  = "Manta API timeout"
+			defaultValue = 3 * time.Second
+		)
+
+		rootCmd.PersistentFlags().DurationP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
 	}
 
 	{

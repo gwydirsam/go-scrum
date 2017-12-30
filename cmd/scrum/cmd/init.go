@@ -37,6 +37,7 @@ var initCmd = &cobra.Command{
 		b.WriteString("[log]\n")
 		b.WriteString(fmt.Sprintf("#format    = %+q\n", viper.GetString(configKeyLogFormat)))
 		b.WriteString(fmt.Sprintf("#level     = %+q\n", viper.GetString(configKeyLogLevel)))
+		b.WriteString(fmt.Sprintf("#stats     = %t\n", viper.GetBool(configKeyLogStats)))
 		b.WriteString(fmt.Sprintf("#use-color = %t\n", viper.GetBool(configKeyLogTermColor)))
 		b.WriteString("\n")
 		b.WriteString("[manta]\n")
@@ -47,6 +48,7 @@ var initCmd = &cobra.Command{
 		//
 		//   ssh-keygen -E md5 -lf ~/.ssh/id_rsa.pub | awk '{print $2}' | cut -d : -f 2-
 		b.WriteString(fmt.Sprintf("#key-id  = %+q\n", viper.GetString(configKeyMantaKeyID)))
+		b.WriteString(fmt.Sprintf("#timeout = %+q\n", viper.GetDuration(configKeyMantaTimeout)))
 		b.WriteString(fmt.Sprintf("#url     = %+q\n", viper.GetString(configKeyMantaURL)))
 		b.WriteString(fmt.Sprintf("#user    = %+q\n", viper.GetString(configKeyMantaUser)))
 

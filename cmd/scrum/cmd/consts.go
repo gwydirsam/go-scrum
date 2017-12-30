@@ -24,10 +24,12 @@ const (
 
 	configKeyLogFormat    = "log.format"
 	configKeyLogLevel     = "log.level"
+	configKeyLogStats     = "log.stats"
 	configKeyLogTermColor = "log.use-color"
 
 	configKeyMantaAccount = "manta.account"
 	configKeyMantaKeyID   = "manta.key-id"
+	configKeyMantaTimeout = "manta.timeout"
 	configKeyMantaURL     = "manta.url"
 	configKeyMantaUser    = "manta.user"
 
