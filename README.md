@@ -184,6 +184,51 @@ Global Flags:
       --use-color              Use ASCII colors
 ```
 
+### `scrum init` Usage
+
+```
+$ scrum init -h
+scrum init -h
+Generate an initial scrum configuraiton file
+
+Usage:
+  scrum init [flags]
+
+Examples:
+  $ scrum init                 # Create a new scrum config file
+  $ scrum init -f -            # Write the config file to stdout
+  $ scrum init -f ./scrum.toml # Create a new scrum config file
+
+Flags:
+  -f, --file string   Config file to initialize (default "~/.config/scrum/scrum.toml")
+  -h, --help          help for init
+
+Global Flags:
+  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string   Manta account name (default "Joyent_Dev")
+      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+      --use-color              Use ASCII colors
+% scrum init -f -
+[highlight]
+#keyword   = "red underline" # exact match "keyword"
+#"substr~" = "italic green"  # substring match "substr"
+#"fuzzy~2" = "reverse blue"  # match "fuzzy" with a distance of 2
+
+[log]
+#format    = "auto"
+#level     = "INFO"
+#use-color = true
+
+[manta]
+#account = "Joyent_Dev"
+#key-id  = "8b:ad:f0:0d:de:ad:be:ef:de:ad:c0:de:ba:dd:ca:fe"
+#url     = "https://us-east.manta.joyent.com"
+#user    = "myuser"
+```
+
 ## `direnv`
 
 1. Install [`direnv`](https://github.com/direnv/direnv) and integrate into your

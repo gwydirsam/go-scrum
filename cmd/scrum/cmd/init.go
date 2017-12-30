@@ -35,8 +35,8 @@ var initCmd = &cobra.Command{
 		b.WriteString(fmt.Sprintf("#\"fuzzy~2\" = %+q  # match \"fuzzy\" with a distance of 2\n", "reverse blue"))
 		b.WriteString("\n")
 		b.WriteString("[log]\n")
-		b.WriteString(fmt.Sprintf("#format = %+q\n", viper.GetString(configKeyLogFormat)))
-		b.WriteString(fmt.Sprintf("#level = %+q\n", viper.GetString(configKeyLogLevel)))
+		b.WriteString(fmt.Sprintf("#format    = %+q\n", viper.GetString(configKeyLogFormat)))
+		b.WriteString(fmt.Sprintf("#level     = %+q\n", viper.GetString(configKeyLogLevel)))
 		b.WriteString(fmt.Sprintf("#use-color = %t\n", viper.GetBool(configKeyLogTermColor)))
 		b.WriteString("\n")
 		b.WriteString("[manta]\n")
@@ -46,9 +46,9 @@ var initCmd = &cobra.Command{
 		// fiction associated with using Manta.
 		//
 		//   ssh-keygen -E md5 -lf ~/.ssh/id_rsa.pub | awk '{print $2}' | cut -d : -f 2-
-		b.WriteString(fmt.Sprintf("#key-id = %+q\n", viper.GetString(configKeyMantaKeyID)))
-		b.WriteString(fmt.Sprintf("#url = %+q\n", viper.GetString(configKeyMantaURL)))
-		b.WriteString(fmt.Sprintf("#user = %+q\n", viper.GetString(configKeyMantaUser)))
+		b.WriteString(fmt.Sprintf("#key-id  = %+q\n", viper.GetString(configKeyMantaKeyID)))
+		b.WriteString(fmt.Sprintf("#url     = %+q\n", viper.GetString(configKeyMantaURL)))
+		b.WriteString(fmt.Sprintf("#user    = %+q\n", viper.GetString(configKeyMantaUser)))
 
 		rawFilename := viper.GetString(configKeyInitFilename)
 		if rawFilename == "-" {
