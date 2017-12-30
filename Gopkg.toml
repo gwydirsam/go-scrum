@@ -18,6 +18,11 @@
 #  version = "2.4.0"
 
 [[constraint]]
+  branch = "gh-7-and-8"
+  name = "github.com/circonus-labs/circonusllhist"
+  source = "github.com/sean-/circonusllhist"
+
+[[constraint]]
   branch = "master"
   name = "github.com/joyent/triton-go"
 
