@@ -184,7 +184,7 @@ func init() {
 			description       = "Log Manta client latency stats on exit"
 		)
 		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.Flags().Lookup(longOpt))
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 

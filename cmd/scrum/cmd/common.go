@@ -33,16 +33,15 @@ func (sc *scrumClient) dumpMantaClientStats() {
 	}
 
 	log.Info().
-		Uint64("delete-calls", sc.deleteCalls).
+		Str("tp99", (time.Duration(sc.Histogram.ValueAtQuantile(0.99)*float64(time.Second))).String()).
+		Str("tp95", (time.Duration(sc.Histogram.ValueAtQuantile(0.95)*float64(time.Second))).String()).
+		Str("tp90", (time.Duration(sc.Histogram.ValueAtQuantile(0.90)*float64(time.Second))).String()).
+		Str("max", (time.Duration(sc.Histogram.Max()*float64(time.Second))).String()).
+		Str("mean", (time.Duration(sc.Histogram.Mean()*float64(time.Second))).String()).
+		Str("min", (time.Duration(sc.Histogram.Min()*float64(time.Second))).String()).
 		Uint64("get-calls", sc.getCalls).
 		Uint64("list-calls", sc.listCalls).
 		Uint64("put-calls", sc.putCalls).
-		Str("max", (time.Duration(sc.Histogram.Max()*float64(time.Second))).String()).
-		Str("min", (time.Duration(sc.Histogram.Min()*float64(time.Second))).String()).
-		Str("mean", (time.Duration(sc.Histogram.Mean()*float64(time.Second))).String()).
-		Str("tp90", (time.Duration(sc.Histogram.ValueAtQuantile(0.90)*float64(time.Second))).String()).
-		Str("tp95", (time.Duration(sc.Histogram.ValueAtQuantile(0.95)*float64(time.Second))).String()).
-		Str("tp99", (time.Duration(sc.Histogram.ValueAtQuantile(0.99) * float64(time.Second))).String()).
 		Msg("stats")
 }
 
