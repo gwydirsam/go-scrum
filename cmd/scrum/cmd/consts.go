@@ -4,6 +4,7 @@ const (
 	dateInputFormat = "2006-01-02"
 
 	configKeyGetAll       = "get.all"
+	configKeyGetHighlight = "highlight"
 	configKeyGetInputDate = "get.date"
 	configKeyGetTomorrow  = "get.tomorrow"
 	configKeyGetUTC       = "get.utc"
