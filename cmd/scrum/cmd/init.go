@@ -29,6 +29,11 @@ var initCmd = &cobra.Command{
 		// 2) Print the file to stdout if filename == "-"
 		// 3) Create the directory for ~/.config/scrum
 		var b bytes.Buffer
+		b.WriteString("[highlight]\n")
+		b.WriteString(fmt.Sprintf("#keyword   = %+q # exact match \"keyword\"\n", "red underline"))
+		b.WriteString(fmt.Sprintf("#\"substr~\" = %+q  # substring match \"substr\"\n", "italic green"))
+		b.WriteString(fmt.Sprintf("#\"fuzzy~2\" = %+q  # match \"fuzzy\" with a distance of 2\n", "reverse blue"))
+		b.WriteString("\n")
 		b.WriteString("[log]\n")
 		b.WriteString(fmt.Sprintf("#format = %+q\n", viper.GetString(configKeyLogFormat)))
 		b.WriteString(fmt.Sprintf("#level = %+q\n", viper.GetString(configKeyLogLevel)))
