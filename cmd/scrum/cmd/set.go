@@ -88,8 +88,9 @@ var setCmd = &cobra.Command{
 			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeySetUsername))
 
 			// Check if scrum exists
+			ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
 			start := time.Now().UnixNano()
-			_, err = c.Objects().Get(context.TODO(), &storage.GetObjectInput{
+			_, err = c.Objects().Get(ctx, &storage.GetObjectInput{
 				ObjectPath: scrumPath,
 			})
 			elapsed := time.Now().UnixNano() - start
@@ -346,12 +347,13 @@ func putObject(c *scrumClient, scrumPath string, reader io.Reader) error {
 		ForceInsert:  true,
 	}
 
+	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
 	defer func(start int64) {
 		elapsed := time.Now().UnixNano() - start
 		c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
 		c.putCalls++
 	}(time.Now().UnixNano())
-	if err := c.Objects().Put(context.TODO(), putInput); err != nil {
+	if err := c.Objects().Put(ctx, putInput); err != nil {
 		return errors.Wrap(err, "unable to put object")
 	}
 
@@ -365,8 +367,9 @@ func unlinkObject(c *scrumClient, scrumPath string) error {
 		ObjectPath: scrumPath,
 	}
 
+	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
 	start := time.Now().UnixNano()
-	if err := c.Objects().Delete(context.TODO(), deleteInput); err != nil {
+	if err := c.Objects().Delete(ctx, deleteInput); err != nil {
 		return errors.Wrap(err, "unable to delete object")
 	}
 	elapsed := time.Now().UnixNano() - start

@@ -50,15 +50,16 @@ Available Commands:
   set         Set scrum information
 
 Flags:
-  -h, --help                   help for scrum
-  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
-  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
-  -A, --manta-account string   Manta account name (default "Joyent_Dev")
-      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
-  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                  Log Manta client latency stats on exit (default true)
-      --use-color              Use ASCII colors
+  -h, --help                     help for scrum
+  -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string         Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string     Manta account name (default "Joyent_Dev")
+      --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                    Log Manta client latency stats on exit (default true)
+      --use-color                Use ASCII colors
 
 Use "scrum [command] --help" for more information about a command.
 ```
@@ -90,14 +91,15 @@ Flags:
   -y, --yesterday               Get scrum for yesterday
 
 Global Flags:
-  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
-  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
-  -A, --manta-account string   Manta account name (default "Joyent_Dev")
-      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
-  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                  Log Manta client latency stats on exit (default true)
-      --use-color              Use ASCII colors
+  -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string         Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string     Manta account name (default "Joyent_Dev")
+      --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                    Log Manta client latency stats on exit (default true)
+      --use-color                Use ASCII colors
 ```
 
 #### `scrum get` Keyword Highlighting
@@ -145,14 +147,15 @@ Flags:
   -v, --vacation uint   Vacation for N days
 
 Global Flags:
-  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
-  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
-  -A, --manta-account string   Manta account name (default "Joyent_Dev")
-      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
-  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                  Log Manta client latency stats on exit (default true)
-      --use-color              Use ASCII colors
+  -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string         Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string     Manta account name (default "Joyent_Dev")
+      --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                    Log Manta client latency stats on exit (default true)
+      --use-color                Use ASCII colors
 ```
 
 ### `scrum list` Usage
@@ -178,14 +181,15 @@ Flags:
   -y, --yesterday     List scrum for yesterday
 
 Global Flags:
-  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
-  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
-  -A, --manta-account string   Manta account name (default "Joyent_Dev")
-      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
-  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                  Log Manta client latency stats on exit (default true)
-      --use-color              Use ASCII colors
+  -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string         Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string     Manta account name (default "Joyent_Dev")
+      --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                    Log Manta client latency stats on exit (default true)
+      --use-color                Use ASCII colors
 ```
 
 ### `scrum init` Usage
@@ -208,14 +212,15 @@ Flags:
   -h, --help          help for init
 
 Global Flags:
-  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
-  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
-  -A, --manta-account string   Manta account name (default "Joyent_Dev")
-      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
-  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                  Log Manta client latency stats on exit (default true)
-      --use-color              Use ASCII colors
+  -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string         Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string     Manta account name (default "Joyent_Dev")
+      --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                    Log Manta client latency stats on exit (default true)
+      --use-color                Use ASCII colors
 % scrum init -f -
 [highlight]
 #keyword   = "red underline" # exact match "keyword"
@@ -231,6 +236,7 @@ Global Flags:
 [manta]
 #account = "Joyent_Dev"
 #key-id  = "8b:ad:f0:0d:de:ad:be:ef:de:ad:c0:de:ba:dd:ca:fe"
+#timeout = "3s"
 #url     = "https://us-east.manta.joyent.com"
 #user    = "myuser"
 ```

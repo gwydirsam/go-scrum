@@ -231,6 +231,20 @@ func init() {
 	}
 
 	{
+		const (
+			key          = configKeyMantaTimeout
+			longOpt      = "manta-timeout"
+			shortOpt     = "T"
+			description  = "Manta API timeout"
+			defaultValue = 3 * time.Second
+		)
+
+		rootCmd.PersistentFlags().DurationP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
 		const key = configKeyMantaURL
 		const longOpt, shortOpt = "manta-url", "E"
 		const defaultValue = "https://us-east.manta.joyent.com"

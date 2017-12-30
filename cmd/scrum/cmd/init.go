@@ -48,6 +48,7 @@ var initCmd = &cobra.Command{
 		//
 		//   ssh-keygen -E md5 -lf ~/.ssh/id_rsa.pub | awk '{print $2}' | cut -d : -f 2-
 		b.WriteString(fmt.Sprintf("#key-id  = %+q\n", viper.GetString(configKeyMantaKeyID)))
+		b.WriteString(fmt.Sprintf("#timeout = %+q\n", viper.GetDuration(configKeyMantaTimeout)))
 		b.WriteString(fmt.Sprintf("#url     = %+q\n", viper.GetString(configKeyMantaURL)))
 		b.WriteString(fmt.Sprintf("#user    = %+q\n", viper.GetString(configKeyMantaUser)))
 

@@ -29,6 +29,7 @@ const (
 
 	configKeyMantaAccount = "manta.account"
 	configKeyMantaKeyID   = "manta.key-id"
+	configKeyMantaTimeout = "manta.timeout"
 	configKeyMantaURL     = "manta.url"
 	configKeyMantaUser    = "manta.user"
 

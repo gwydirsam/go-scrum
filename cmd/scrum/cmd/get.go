@@ -351,8 +351,9 @@ var getCmd = &cobra.Command{
 func getAllScrum(unbufOut io.Writer, c *scrumClient, scrumDate time.Time) error {
 	scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout))
 
+	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
 	start := time.Now().UnixNano()
-	dirEnts, err := c.Dir().List(context.Background(), &storage.ListDirectoryInput{
+	dirEnts, err := c.Dir().List(ctx, &storage.ListDirectoryInput{
 		DirectoryName: scrumPath,
 	})
 	elapsed := time.Now().UnixNano() - start
@@ -412,8 +413,9 @@ func getAllScrum(unbufOut io.Writer, c *scrumClient, scrumDate time.Time) error 
 func getSingleScrum(w io.Writer, c *scrumClient, scrumDate time.Time, user string, includeHeader bool) error {
 	objectPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), user)
 
+	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
 	start := time.Now().UnixNano()
-	obj, err := c.Objects().Get(context.Background(), &storage.GetObjectInput{
+	obj, err := c.Objects().Get(ctx, &storage.GetObjectInput{
 		ObjectPath: objectPath,
 	})
 	elapsed := time.Now().UnixNano() - start

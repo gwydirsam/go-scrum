@@ -146,8 +146,9 @@ var listCmd = &cobra.Command{
 func listScrummers(c *scrumClient, scrumDate time.Time) error {
 	scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout))
 
+	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
 	start := time.Now().UnixNano()
-	dirEnts, err := c.Dir().List(context.Background(), &storage.ListDirectoryInput{
+	dirEnts, err := c.Dir().List(ctx, &storage.ListDirectoryInput{
 		DirectoryName: scrumPath,
 	})
 	elapsed := time.Now().UnixNano() - start
