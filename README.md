@@ -116,7 +116,7 @@ token = "red underline"
 "foobar~2" = "italic"
 ```
 
-See [Color Definitions](#color_definitions) for a list of available colors.
+See [Color Definitions](#color-definitions) for a list of available colors.
 
 ### `scrum set` Usage
 
