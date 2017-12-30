@@ -232,10 +232,11 @@ var getCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		color.NoColor = !viper.GetBool(configKeyLogTermColor)
 
-		client, err := getMantaClient()
+		client, err := getScrumClient()
 		if err != nil {
 			return errors.Wrap(err, "unable to create a new manta client")
 		}
+		defer client.dumpMantaClientStats()
 
 		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyGetInputDate))
 		if err != nil {
@@ -347,12 +348,16 @@ var getCmd = &cobra.Command{
 	},
 }
 
-func getAllScrum(unbufOut io.Writer, c *storage.StorageClient, scrumDate time.Time) error {
+func getAllScrum(unbufOut io.Writer, c *scrumClient, scrumDate time.Time) error {
 	scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout))
 
+	start := time.Now().UnixNano()
 	dirEnts, err := c.Dir().List(context.Background(), &storage.ListDirectoryInput{
 		DirectoryName: scrumPath,
 	})
+	elapsed := time.Now().UnixNano() - start
+	c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
+	c.listCalls++
 	if err != nil {
 		return errors.Wrap(err, "unable to list manta directory")
 	}
@@ -404,12 +409,16 @@ func getAllScrum(unbufOut io.Writer, c *storage.StorageClient, scrumDate time.Ti
 	return nil
 }
 
-func getSingleScrum(w io.Writer, c *storage.StorageClient, scrumDate time.Time, user string, includeHeader bool) error {
+func getSingleScrum(w io.Writer, c *scrumClient, scrumDate time.Time, user string, includeHeader bool) error {
 	objectPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), user)
 
+	start := time.Now().UnixNano()
 	obj, err := c.Objects().Get(context.Background(), &storage.GetObjectInput{
 		ObjectPath: objectPath,
 	})
+	elapsed := time.Now().UnixNano() - start
+	c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
+	c.getCalls++
 	if err != nil {
 		return errors.Wrap(err, "unable to get manta object")
 	}

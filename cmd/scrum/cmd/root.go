@@ -178,6 +178,18 @@ func init() {
 
 	{
 		const (
+			key               = configKeyLogStats
+			longOpt, shortOpt = "stats", "s"
+			defaultValue      = true
+			description       = "Log Manta client latency stats on exit"
+		)
+		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.Flags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
 			key         = configKeyLogTermColor
 			longOpt     = "use-color"
 			shortOpt    = ""

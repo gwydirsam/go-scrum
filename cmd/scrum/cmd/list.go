@@ -120,10 +120,11 @@ var listCmd = &cobra.Command{
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := getMantaClient()
+		client, err := getScrumClient()
 		if err != nil {
-			return errors.Wrap(err, "unable to create a new manta client")
+			return errors.Wrap(err, "unable to create a new scrum client")
 		}
+		defer client.dumpMantaClientStats()
 
 		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyListInputDate))
 		if err != nil {
@@ -142,12 +143,16 @@ var listCmd = &cobra.Command{
 }
 
 // listScrummers prints every user who scrummed
-func listScrummers(c *storage.StorageClient, scrumDate time.Time) error {
+func listScrummers(c *scrumClient, scrumDate time.Time) error {
 	scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout))
 
+	start := time.Now().UnixNano()
 	dirEnts, err := c.Dir().List(context.Background(), &storage.ListDirectoryInput{
 		DirectoryName: scrumPath,
 	})
+	elapsed := time.Now().UnixNano() - start
+	c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
+	c.listCalls++
 	if err != nil {
 		return errors.Wrap(err, "unable to list manta directory")
 	}

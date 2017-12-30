@@ -57,6 +57,7 @@ Flags:
       --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
   -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                  Log Manta client latency stats on exit (default true)
       --use-color              Use ASCII colors
 
 Use "scrum [command] --help" for more information about a command.
@@ -95,6 +96,7 @@ Global Flags:
       --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
   -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                  Log Manta client latency stats on exit (default true)
       --use-color              Use ASCII colors
 ```
 
@@ -149,6 +151,7 @@ Global Flags:
       --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
   -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                  Log Manta client latency stats on exit (default true)
       --use-color              Use ASCII colors
 ```
 
@@ -181,6 +184,7 @@ Global Flags:
       --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
   -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                  Log Manta client latency stats on exit (default true)
       --use-color              Use ASCII colors
 ```
 
@@ -210,6 +214,7 @@ Global Flags:
       --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
   -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+  -s, --stats                  Log Manta client latency stats on exit (default true)
       --use-color              Use ASCII colors
 % scrum init -f -
 [highlight]
@@ -220,6 +225,7 @@ Global Flags:
 [log]
 #format    = "auto"
 #level     = "INFO"
+#stats     = true
 #use-color = true
 
 [manta]

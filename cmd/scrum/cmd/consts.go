@@ -24,6 +24,7 @@ const (
 
 	configKeyLogFormat    = "log.format"
 	configKeyLogLevel     = "log.level"
+	configKeyLogStats     = "log.stats"
 	configKeyLogTermColor = "log.use-color"
 
 	configKeyMantaAccount = "manta.account"

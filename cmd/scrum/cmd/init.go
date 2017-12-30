@@ -37,6 +37,7 @@ var initCmd = &cobra.Command{
 		b.WriteString("[log]\n")
 		b.WriteString(fmt.Sprintf("#format    = %+q\n", viper.GetString(configKeyLogFormat)))
 		b.WriteString(fmt.Sprintf("#level     = %+q\n", viper.GetString(configKeyLogLevel)))
+		b.WriteString(fmt.Sprintf("#stats     = %t\n", viper.GetBool(configKeyLogStats)))
 		b.WriteString(fmt.Sprintf("#use-color = %t\n", viper.GetBool(configKeyLogTermColor)))
 		b.WriteString("\n")
 		b.WriteString("[manta]\n")
