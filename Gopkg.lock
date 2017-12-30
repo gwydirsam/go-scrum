@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/deckarep/golang-set"
+  packages = ["."]
+  revision = "1d4478f51bed434f1dadf96dcd9b43aabac66795"
+  version = "v1.7"
+
+[[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
@@ -42,6 +48,12 @@
   packages = ["."]
   revision = "d419a98cdbed11a922bf76f257b7c4be79b50e73"
   version = "v1.7.4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/masatana/go-textdistance"
+  packages = ["."]
+  revision = "59954f2a9d67847c68659c36d884c4ae9aba9726"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -166,6 +178,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e256f56609cbd6bf5db1fa99a4bbb97a8d7984abaf85fbaf18eb72bd7a4a0a5d"
+  inputs-digest = "afa60b224b1dd84b3567bb2365de889fd2dee9e63f7b5f9278096d40a3139dfc"
   solver-name = "gps-cdcl"
   solver-version = 1

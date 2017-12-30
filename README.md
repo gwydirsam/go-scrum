@@ -78,14 +78,15 @@ Examples:
   $ scrum get -t -u other.username # Get other.username's scrum for tomorrow
 
 Flags:
-  -a, --all           Get scrum for all users
-  -D, --date string   Date for scrum (default "2017-12-11")
-  -h, --help          help for get
-  -t, --tomorrow      Get scrum for the next day
-  -P, --use-pager     Use a pager to read the output (defaults to $PAGER, less(1), or more(1)) (default true)
-  -u, --user string   Get scrum for specified user (default "$USER")
-  -Z, --utc           Get mtime data in UTC
-  -y, --yesterday     Get scrum for yesterday
+  -a, --all                     Get scrum for all users
+  -D, --date string             Date for scrum (default "2017-12-11")
+  -h, --help                    help for get
+  -H, --highlight stringArray   Highlight words definition
+  -t, --tomorrow                Get scrum for the next day
+  -P, --use-pager               Use a pager to read the output (defaults to $PAGER, less(1), or more(1)) (default true)
+  -u, --user string             Get scrum for specified user (default "$USER")
+  -Z, --utc                     Get mtime data in UTC
+  -y, --yesterday               Get scrum for yesterday
 
 Global Flags:
   -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
@@ -96,6 +97,26 @@ Global Flags:
   -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
       --use-color              Use ASCII colors
 ```
+
+#### `scrum get` Keyword Highlighting
+
+`scrum` can highlight keywords.  Each keyword must be configured with a color
+definition in the `scrum` configuration file.  The following snippet is the
+default configuration file for a token (TOML encoding):
+
+```
+[higlight]
+# Change the font for "token" to be red and underlined.  Perform an exact match.
+token = "red underline"
+
+# Perform a substring match for "lorem".  Useful for small keywords.
+"lorem~" = "blue blink reverse"
+
+# Search for "foobar" with a Damerau–Levenshtein distance of 2.  Useful for misspelled words.
+"foobar~2" = "italic"
+```
+
+See [Color Definitions](#color-definitions) for a list of available colors.
 
 ### `scrum set` Usage
 
@@ -163,6 +184,51 @@ Global Flags:
       --use-color              Use ASCII colors
 ```
 
+### `scrum init` Usage
+
+```
+$ scrum init -h
+scrum init -h
+Generate an initial scrum configuraiton file
+
+Usage:
+  scrum init [flags]
+
+Examples:
+  $ scrum init                 # Create a new scrum config file
+  $ scrum init -f -            # Write the config file to stdout
+  $ scrum init -f ./scrum.toml # Create a new scrum config file
+
+Flags:
+  -f, --file string   Config file to initialize (default "~/.config/scrum/scrum.toml")
+  -h, --help          help for init
+
+Global Flags:
+  -F, --log-format string      Specify the log format ("auto", "zerolog", or "human") (default "auto")
+  -l, --log-level string       Change the log level being sent to stdout (default "INFO")
+  -A, --manta-account string   Manta account name (default "Joyent_Dev")
+      --manta-key-id string    SSH key fingerprint (default is $MANTA_KEY_ID)
+  -E, --manta-url string       URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
+  -U, --manta-user string      Manta username to scrum as (default "$MANTA_USER")
+      --use-color              Use ASCII colors
+% scrum init -f -
+[highlight]
+#keyword   = "red underline" # exact match "keyword"
+#"substr~" = "italic green"  # substring match "substr"
+#"fuzzy~2" = "reverse blue"  # match "fuzzy" with a distance of 2
+
+[log]
+#format    = "auto"
+#level     = "INFO"
+#use-color = true
+
+[manta]
+#account = "Joyent_Dev"
+#key-id  = "8b:ad:f0:0d:de:ad:be:ef:de:ad:c0:de:ba:dd:ca:fe"
+#url     = "https://us-east.manta.joyent.com"
+#user    = "myuser"
+```
+
 ## `direnv`
 
 1. Install [`direnv`](https://github.com/direnv/direnv) and integrate into your
@@ -177,3 +243,49 @@ Global Flags:
 
 3. `direnv allow` the directory containing the `.envrc` file (e.g. `cd ~/src/joyent/engdoc && direnv allow`).
 
+
+## Color Definitions
+
+| Color Attribute | Description |
+| --------------- | ----------- |
+| `bold` | **bold** |
+| `faint` | |
+| `italic` | *Italic* |
+| `underline` | Underline word |
+| `blink` | Slow blink |
+| `reverse` | |
+| `strikethrough` | ~~Strikethrough~~ |
+| `black`, `fg-black` | |
+| `red`, `fg-red` | |
+| `green`, `fg-green` | |
+| `yellow`, `fg-yellow` | |
+| `blue`, `fg-blue` | |
+| `magenta`, `fg-magenta` | |
+| `cyan`, `fg-cyan` | |
+| `white`, `fg-white` | |
+| `black-low`, `fg-black-low` | |
+| `red-low`, `fg-red-low` | |
+| `green-low`, `fg-green-low` | |
+| `yellow-low`, `fg-yellow-low` | |
+| `blue-low`, `fg-blue-low` | |
+| `magenta-low`, `fg-magenta-low` | |
+| `cyan-low`, `fg-cyan-low` | |
+| `white-low`, `fg-white-low` | |
+| `bg-black` | |
+| `bg-red` | |
+| `bg-green` | |
+| `bg-yellow` | |
+| `bg-blue` | |
+| `bg-magenta` | |
+| `bg-cyan` | |
+| `bg-white` | |
+| `bg-black-low` | |
+| `bg-red-low` | |
+| `bg-green-low` | |
+| `bg-yellow-low` | |
+| `bg-blue-low` | |
+| `bg-magenta-low` | |
+| `bg-cyan-low` | |
+| `bg-white-low` | |
+
+Color definitions are additive.

@@ -9,10 +9,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/gwydirsam/go-scrum/highlighter"
 	"github.com/gwydirsam/go-scrum/pager"
 	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
@@ -23,7 +26,81 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var colorAttrs map[string]color.Attribute
+
 func init() {
+	colorAttrs = map[string]color.Attribute{
+		// Default FG colors
+		"black":   color.FgHiBlack,
+		"red":     color.FgHiRed,
+		"green":   color.FgHiGreen,
+		"yellow":  color.FgHiYellow,
+		"blue":    color.FgHiBlue,
+		"magenta": color.FgHiMagenta,
+		"cyan":    color.FgHiCyan,
+		"white":   color.FgHiWhite,
+
+		// Default FG colors.  Inverted the color definitions so high
+		// intensity colors are the default.
+		"black-low":   color.FgBlack,
+		"red-low":     color.FgRed,
+		"green-low":   color.FgGreen,
+		"yellow-low":  color.FgYellow,
+		"blue-low":    color.FgBlue,
+		"magenta-low": color.FgMagenta,
+		"cyan-low":    color.FgCyan,
+		"white-low":   color.FgWhite,
+
+		"fg-black":   color.FgHiBlack,
+		"fg-red":     color.FgHiRed,
+		"fg-green":   color.FgHiGreen,
+		"fg-yellow":  color.FgHiYellow,
+		"fg-blue":    color.FgHiBlue,
+		"fg-magenta": color.FgHiMagenta,
+		"fg-cyan":    color.FgHiCyan,
+		"fg-white":   color.FgHiWhite,
+
+		// Default FG colors.  Inverted the color definitions so high
+		// intensity colors are the default.
+		"fg-black-low":   color.FgBlack,
+		"fg-red-low":     color.FgRed,
+		"fg-green-low":   color.FgGreen,
+		"fg-yellow-low":  color.FgYellow,
+		"fg-blue-low":    color.FgBlue,
+		"fg-magenta-low": color.FgMagenta,
+		"fg-cyan-low":    color.FgCyan,
+		"fg-white-low":   color.FgWhite,
+
+		"bg-black":   color.BgHiBlack,
+		"bg-red":     color.BgHiRed,
+		"bg-green":   color.BgHiGreen,
+		"bg-yellow":  color.BgHiYellow,
+		"bg-blue":    color.BgHiBlue,
+		"bg-magenta": color.BgHiMagenta,
+		"bg-cyan":    color.BgHiCyan,
+		"bg-white":   color.BgHiWhite,
+
+		// Inverted the color definitions so high intensity background
+		// colors are the default.
+		"bg-black-low":   color.BgBlack,
+		"bg-red-low":     color.BgRed,
+		"bg-green-low":   color.BgGreen,
+		"bg-yellow-low":  color.BgYellow,
+		"bg-blue-low":    color.BgBlue,
+		"bg-magenta-low": color.BgMagenta,
+		"bg-cyan-low":    color.BgCyan,
+		"bg-white-low":   color.BgWhite,
+
+		// Text modifiers
+		"bold":          color.Bold,
+		"faint":         color.Faint,
+		"italic":        color.Italic,
+		"underline":     color.Underline,
+		"blink":         color.BlinkSlow, // color.BlinkRapid
+		"reverse":       color.ReverseVideo,
+		"strikethrough": color.CrossedOut,
+	}
+
 	{
 		const (
 			key          = configKeyGetAll
@@ -48,6 +125,20 @@ func init() {
 		defaultValue := time.Now().Format(dateInputFormat)
 
 		getCmd.Flags().StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
+			key         = configKeyGetHighlight
+			longName    = "highlight"
+			shortName   = "H"
+			description = "Highlight words definition"
+		)
+		var defaultValue []string
+
+		getCmd.Flags().StringArrayP(longName, shortName, defaultValue, description)
 		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
@@ -168,6 +259,81 @@ var getCmd = &cobra.Command{
 			w = p
 		} else {
 			w = os.Stdout
+		}
+
+		inputTokens := viper.GetStringMap(configKeyGetHighlight)
+
+		switch {
+		case viper.IsSet(configKeyGetHighlight) && len(inputTokens) > 0:
+			toks := make([]*highlighter.TokenColor, 0, len(inputTokens))
+			for k, vRaw := range inputTokens {
+				tokenColor := &highlighter.TokenColor{
+					Color: &color.Color{},
+				}
+
+				// Extract meaning out of the highlight token
+				re := regexp.MustCompile(`^(.*?)(~([\d]*))?$`)
+				const tokenPos = 1
+				const fuzzyMatch = 2
+				const distanceTok = 3
+				md := re.FindStringSubmatch(k)
+				switch {
+				case md == nil || md[fuzzyMatch] == "":
+					tokenColor.Token = k
+				case md[distanceTok] == "":
+					tokenColor.Token = md[tokenPos]
+					tokenColor.Submatch = true
+				case md[distanceTok] != "":
+					tokenColor.Token = md[tokenPos]
+
+					dist, err := strconv.ParseInt(md[distanceTok], 0, 8)
+					if err != nil {
+						return errors.Wrap(err, "unable to parse distance")
+					}
+
+					tokenColor.Distance = int(dist)
+				default:
+					log.Warn().Str("token", k).Msgf("skipping %s.%q, input is not a valid token", configKeyGetHighlight, k)
+					continue
+				}
+
+				if _, ok := vRaw.(string); !ok {
+					log.Warn().Interface("raw", vRaw).Msgf("skipping %s.%q, input is not a string", configKeyGetHighlight, k)
+					continue
+				}
+				colorDefinition := vRaw.(string)
+
+				// Tokenize the values and add each matching color definition to the
+				// replacement format.
+				scanner := bufio.NewScanner(strings.NewReader(colorDefinition))
+				scanner.Split(bufio.ScanWords)
+
+				for scanner.Scan() {
+					colorName := scanner.Text()
+					if colorVal, found := colorAttrs[strings.ToLower(colorName)]; found {
+						tokenColor.Color.Add(colorVal)
+					} else {
+						log.Warn().Str("color", colorName).Msgf("invalid color value %q in %q.%s value", colorName, configKeyGetHighlight, k)
+					}
+				}
+				if err := scanner.Err(); err != nil {
+					log.Error().Err(err).Msg("error tokenizing input")
+				}
+
+				toks = append(toks, tokenColor)
+			}
+
+			hInput := highlighter.NewInput{
+				Writer: w,
+				Tokens: toks,
+			}
+			hWriter, err := highlighter.New(hInput)
+			if err != nil {
+				return errors.Wrap(err, "unable to create a highlighter")
+			}
+
+			w = hWriter
+			defer hWriter.Flush()
 		}
 
 		switch {
