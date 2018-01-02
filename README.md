@@ -58,7 +58,7 @@ Flags:
   -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                    Log Manta client latency stats on exit (default true)
+  -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
 
 Use "scrum [command] --help" for more information about a command.
@@ -98,7 +98,7 @@ Global Flags:
   -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                    Log Manta client latency stats on exit (default true)
+  -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
 ```
 
@@ -154,7 +154,7 @@ Global Flags:
   -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                    Log Manta client latency stats on exit (default true)
+  -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
 ```
 
@@ -188,7 +188,7 @@ Global Flags:
   -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                    Log Manta client latency stats on exit (default true)
+  -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
 ```
 
@@ -219,7 +219,7 @@ Global Flags:
   -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
-  -s, --stats                    Log Manta client latency stats on exit (default true)
+  -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
 % scrum init -f -
 [highlight]

@@ -185,7 +185,7 @@ func init() {
 	{
 		const (
 			key               = configKeyLogStats
-			longOpt, shortOpt = "stats", "s"
+			longOpt, shortOpt = "stats", "S"
 			defaultValue      = true
 			description       = "Log Manta client latency stats on exit"
 		)
