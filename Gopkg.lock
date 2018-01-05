@@ -2,11 +2,10 @@
 
 
 [[projects]]
-  branch = "gh-7-and-8"
+  branch = "master"
   name = "github.com/circonus-labs/circonusllhist"
   packages = ["."]
-  revision = "c35495bb77c15b38863d0c6d113df106c5e2a2a5"
-  source = "github.com/sean-/circonusllhist"
+  revision = "1e65893c445875524c5610f2a58aef24e30ef98a"
 
 [[projects]]
   name = "github.com/deckarep/golang-set"
@@ -150,7 +149,7 @@
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "ccaecb155a2177302cb56cae929251a256d0f646"
+  revision = "b95ab734e27d33e0d8fbabf71ca990568d4e2020"
 
 [[projects]]
   branch = "master"
@@ -174,13 +173,13 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["curve25519","ed25519","ed25519/internal/edwards25519","ssh","ssh/agent","ssh/terminal"]
-  revision = "95a4943f35d008beabde8c11e5075a1b714e6419"
+  revision = "0fcca4842a8d74bfddc2c96a073bd2a4d2a7a2e8"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "83801418e1b59fb1880e363299581ee543af32ca"
+  revision = "a3f2cbd54cf5dfe3fbaccf76375fdb12f67654c8"
 
 [[projects]]
   branch = "master"
@@ -192,11 +191,11 @@
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
+  revision = "0e4404da71227dcc02fb1deee803d93e86d08f72"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1e158f00be108c0849a0d655d0404925b48d8612dbd7679da249751cf1f83372"
+  inputs-digest = "d76ddc5e0f3e5727bf4959c4c5f940d116c8efb8e398084bba122e563f645969"
   solver-name = "gps-cdcl"
   solver-version = 1
