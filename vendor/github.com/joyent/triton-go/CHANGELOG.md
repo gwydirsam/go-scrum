@@ -1,5 +1,10 @@
 ## Unreleased
 
+- addition of triton-go errors package to expose unwraping of internal errors
+- identity/policies: Add support for managing policies in Triton [#86]
+- Migration from hashicorp/errwrap to pkg/errors
+- Using path.Join() for URL structures rather than fmt.Sprintf()
+
 ## 0.5.2 (December 28)
 
 - Standardise the API SSH Signers input casing and naming

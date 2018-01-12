@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joyent/triton-go/client"
+	tritonError "github.com/joyent/triton-go/errors"
 	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -99,10 +99,10 @@ var setCmd = &cobra.Command{
 
 		ERROR_HANDLING:
 			switch {
-			case err != nil && client.IsResourceNotFoundError(err):
+			case err != nil && tritonError.IsResourceNotFoundError(err):
 				// User data doesn't exist
 				break ERROR_HANDLING
-			case err != nil && !client.IsResourceNotFoundError(err):
+			case err != nil && !tritonError.IsResourceNotFoundError(err):
 				return errors.Wrap(err, "unknown error")
 			case err == nil:
 				// User data does exist
