@@ -4,7 +4,7 @@
 
 The zerolog package provides a fast and simple logger dedicated to JSON output.
 
-Zerolog's API is designed to provide both a great developer experience and stunning [performance](#performance). Its unique chaining API allows zerolog to write JSON log events by avoiding allocations and reflection.
+Zerolog's API is designed to provide both a great developer experience and stunning [performance](#benchmarks). Its unique chaining API allows zerolog to write JSON log events by avoiding allocations and reflection.
 
 The uber's [zap](https://godoc.org/go.uber.org/zap) library pioneered this approach. Zerolog is taking this concept to the next level with simpler to use API and even better performance.
 
@@ -18,6 +18,7 @@ To keep the code base and the API simple, zerolog focuses on JSON logging only. 
 * Low to zero allocation
 * Level logging
 * Sampling
+* Hooks
 * Contextual fields
 * `context.Context` integration
 * `net/http` helpers
@@ -185,6 +186,22 @@ sampled.Debug().Msg("hello world")
 // Output: {"time":1494567715,"level":"debug","message":"hello world"}
 ```
 
+### Hooks
+
+```go
+type SeverityHook struct{}
+
+func (h SeverityHook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
+    if level != zerolog.NoLevel {
+        e.Str("severity", level.String())
+    }
+}
+
+hooked := log.Hook(SeverityHook{})
+hooked.Warn().Msg("")
+
+// Output: {"level":"warn","severity":"warn"}
+```
 
 ### Pass a sub-logger by context
 
