@@ -256,7 +256,7 @@ func init() {
 			longOpt, shortOpt = "tomorrow", "t"
 			defaultValue      = false
 		)
-		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the next day")
+		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the next weekday")
 		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
@@ -307,7 +307,7 @@ func init() {
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
 		)
-		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for yesterday")
+		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for previous weekday")
 		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 
