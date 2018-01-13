@@ -73,6 +73,22 @@ func getScrumClient() (*scrumClient, error) {
 	}, nil
 }
 
+// getTomorrow returns the next weekday.
+//
+// TODO: teach getTomorrow to take in to consideration a vacation schedule.
+func getTomorrow(scrumDate time.Time) time.Time {
+	switch scrumDate.Weekday() {
+	case time.Friday:
+		return scrumDate.AddDate(0, 0, 3)
+	case time.Saturday:
+		return scrumDate.AddDate(0, 0, 2)
+	case time.Sunday:
+		return scrumDate.AddDate(0, 0, 1)
+	default:
+		return scrumDate.AddDate(0, 0, 1)
+	}
+}
+
 func getUser(userKey string) string {
 	switch {
 	case viper.IsSet(userKey):
@@ -93,6 +109,22 @@ func getUser(userKey string) string {
 
 	log.Warn().Msgf("unable to detect a username, please set %q or %q in %q", userKey, configKeyMantaUser, viper.ConfigFileUsed)
 	return ""
+}
+
+// getYesterday returns the previous weekday.
+//
+// TODO: teach getYesterday to take in to consideration a vacation schedule.
+func getYesterday(scrumDate time.Time) time.Time {
+	switch scrumDate.Weekday() {
+	case time.Monday:
+		return scrumDate.AddDate(0, 0, -3)
+	case time.Sunday:
+		return scrumDate.AddDate(0, 0, -2)
+	case time.Saturday:
+		return scrumDate.AddDate(0, 0, -1)
+	default:
+		return scrumDate.AddDate(0, 0, -1)
+	}
 }
 
 func interpolateValue(val string) string {

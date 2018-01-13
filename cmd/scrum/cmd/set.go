@@ -69,9 +69,9 @@ var setCmd = &cobra.Command{
 
 		switch {
 		case viper.GetBool(configKeySetTomorrow):
-			inputScrumDate = inputScrumDate.AddDate(0, 0, 1)
+			inputScrumDate = getTomorrow(inputScrumDate)
 		case viper.GetBool(configKeySetYesterday):
-			inputScrumDate = inputScrumDate.AddDate(0, 0, -1)
+			inputScrumDate = getYesterday(inputScrumDate)
 		}
 
 		// create end date string for vacation and sick time
