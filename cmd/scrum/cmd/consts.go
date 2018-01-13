@@ -7,10 +7,13 @@ const (
 	configKeyGetHighlight = "highlight"
 	configKeyGetInputDate = "get.date"
 	configKeyGetTomorrow  = "get.tomorrow"
-	configKeyGetUTC       = "get.utc"
 	configKeyGetUsePager  = "get.use-pager"
 	configKeyGetUsername  = "get.username"
 	configKeyGetYesterday = "get.yesterday"
+
+	configKeyHolidays = "holidays"
+	configKeyCountry  = "general.country"
+	configKeyUseUTC   = "general.utc"
 
 	configKeyInitFilename = "init.config-file"
 
@@ -19,7 +22,6 @@ const (
 	configKeyListUsers     = "list.mode"
 	configKeyListUsersAll  = "list.opt-all"
 	configKeyListUsersOne  = "list.opt-one"
-	configKeyListUsersUTC  = "list.opt-utc"
 	configKeyListYesterday = "list.yesterday"
 
 	configKeyLogFormat    = "log.format"

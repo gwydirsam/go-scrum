@@ -50,16 +50,18 @@ Available Commands:
   set         Set scrum information
 
 Flags:
+  -C, --country string           Country holiday schedule (default "us")
   -h, --help                     help for scrum
   -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
   -l, --log-level string         Change the log level being sent to stdout (default "INFO")
   -A, --manta-account string     Manta account name (default "Joyent_Dev")
       --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
+  -Z, --utc                      Display times in UTC
 
 Use "scrum [command] --help" for more information about a command.
 ```
@@ -87,19 +89,20 @@ Flags:
   -t, --tomorrow                Get scrum for the next weekday
   -P, --use-pager               Use a pager to read the output (defaults to $PAGER, less(1), or more(1)) (default true)
   -u, --user string             Get scrum for specified user (default "$USER")
-  -Z, --utc                     Get mtime data in UTC
   -y, --yesterday               Get scrum for the previous weekday
 
 Global Flags:
+  -C, --country string           Country holiday schedule (default "us")
   -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
   -l, --log-level string         Change the log level being sent to stdout (default "INFO")
   -A, --manta-account string     Manta account name (default "Joyent_Dev")
       --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
+  -Z, --utc                      Display times in UTC
 ```
 
 #### `scrum get` Keyword Highlighting
@@ -147,15 +150,17 @@ Flags:
   -v, --vacation uint   Vacation for N days
 
 Global Flags:
+  -C, --country string           Country holiday schedule (default "us")
   -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
   -l, --log-level string         Change the log level being sent to stdout (default "INFO")
   -A, --manta-account string     Manta account name (default "Joyent_Dev")
       --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
+  -Z, --utc                      Display times in UTC
 ```
 
 ### `scrum list` Usage
@@ -177,19 +182,20 @@ Flags:
   -h, --help          help for list
   -t, --tomorrow      List scrums for the next weekday
   -1, --usernames     List usernames only
-  -Z, --utc           List mtime data in UTC
   -y, --yesterday     List scrum for the previous weekday
 
 Global Flags:
+  -C, --country string           Country holiday schedule (default "us")
   -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
   -l, --log-level string         Change the log level being sent to stdout (default "INFO")
   -A, --manta-account string     Manta account name (default "Joyent_Dev")
       --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
+  -Z, --utc                      Display times in UTC
 ```
 
 ### `scrum init` Usage
@@ -212,16 +218,21 @@ Flags:
   -h, --help          help for init
 
 Global Flags:
+  -C, --country string           Country holiday schedule (default "us")
   -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
   -l, --log-level string         Change the log level being sent to stdout (default "INFO")
   -A, --manta-account string     Manta account name (default "Joyent_Dev")
       --manta-key-id string      SSH key fingerprint (default is $MANTA_KEY_ID)
-  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -T, --manta-timeout duration   Manta API timeout (default 3s)
+  -E, --manta-url string         URL of the Manta instance (default is $MANTA_URL) (default "https://us-east.manta.joyent.com")
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
+  -Z, --utc                      Display times in UTC
 % scrum init -f -
+[general]
+#country = "us"
+
 [highlight]
 #keyword   = "red underline" # exact match "keyword"
 #"substr~" = "italic green"  # substring match "substr"

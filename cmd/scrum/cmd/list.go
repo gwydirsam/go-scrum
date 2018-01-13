@@ -72,20 +72,6 @@ func init() {
 
 	{
 		const (
-			key          = configKeyListUsersUTC
-			longName     = "utc"
-			shortName    = "Z"
-			defaultValue = false
-			description  = "List mtime data in UTC"
-		)
-
-		listCmd.Flags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, listCmd.Flags().Lookup(longName))
-		viper.SetDefault(key, defaultValue)
-	}
-
-	{
-		const (
 			key               = configKeyListYesterday
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
@@ -126,16 +112,16 @@ var listCmd = &cobra.Command{
 		}
 		defer client.dumpMantaClientStats()
 
-		scrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeyListInputDate))
+		scrumDate, err := getDateInLocation(viper.GetString(configKeyListInputDate))
 		if err != nil {
-			return errors.Wrap(err, "unable to parse date")
+			return errors.Wrap(err, "unable to parse scrum date")
 		}
 
 		switch {
 		case viper.GetBool(configKeyListTomorrow):
-			scrumDate = getTomorrow(scrumDate)
+			scrumDate = getNextWeekday(scrumDate)
 		case viper.GetBool(configKeyListYesterday):
-			scrumDate = getYesterday(scrumDate)
+			scrumDate = getPreviousWeekday(scrumDate)
 		}
 
 		return listScrummers(client, scrumDate)
@@ -179,7 +165,7 @@ func listScrummers(c *scrumClient, scrumDate time.Time) error {
 		return nil
 	case viper.GetBool(configKeyListUsersAll):
 		var tz string
-		if viper.GetBool(configKeyListUsersUTC) {
+		if viper.GetBool(configKeyUseUTC) {
 			tz, _ = scrumDate.UTC().Zone()
 		} else {
 			tz, _ = scrumDate.Local().Zone()
@@ -214,7 +200,7 @@ func listScrummers(c *scrumClient, scrumDate time.Time) error {
 			}
 
 			mtime := ent.ModifiedTime
-			if !viper.GetBool(configKeyListUsersUTC) {
+			if !viper.GetBool(configKeyUseUTC) {
 				mtime = mtime.Local()
 			}
 
