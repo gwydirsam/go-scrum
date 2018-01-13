@@ -84,11 +84,11 @@ Flags:
   -D, --date string             Date for scrum (default "2017-12-11")
   -h, --help                    help for get
   -H, --highlight stringArray   Highlight words definition
-  -t, --tomorrow                Get scrum for the next day
+  -t, --tomorrow                Get scrum for the next weekday
   -P, --use-pager               Use a pager to read the output (defaults to $PAGER, less(1), or more(1)) (default true)
   -u, --user string             Get scrum for specified user (default "$USER")
   -Z, --utc                     Get mtime data in UTC
-  -y, --yesterday               Get scrum for yesterday
+  -y, --yesterday               Get scrum for the previous weekday
 
 Global Flags:
   -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")
@@ -142,7 +142,7 @@ Flags:
   -f, --force           Force overwrite of any present scrum
   -h, --help            help for set
   -s, --sick uint       Sick leave for N days
-  -t, --tomorrow        Set scrum for the next day
+  -t, --tomorrow        Set scrum for the next weekday
   -u, --user string     Set scrum for specified user (default "$USER")
   -v, --vacation uint   Vacation for N days
 
@@ -175,10 +175,10 @@ Flags:
   -a, --all           List all metadata details (default true)
   -D, --date string   Date for scrum (default "2017-12-11")
   -h, --help          help for list
-  -t, --tomorrow      List scrums for the next day
+  -t, --tomorrow      List scrums for the next weekday
   -1, --usernames     List usernames only
   -Z, --utc           List mtime data in UTC
-  -y, --yesterday     List scrum for yesterday
+  -y, --yesterday     List scrum for the previous weekday
 
 Global Flags:
   -F, --log-format string        Specify the log format ("auto", "zerolog", or "human") (default "auto")

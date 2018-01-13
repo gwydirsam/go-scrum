@@ -65,7 +65,7 @@ func init() {
 			longOpt, shortOpt = "tomorrow", "t"
 			defaultValue      = false
 		)
-		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrums for the next day")
+		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrums for the next weekday")
 		viper.BindPFlag(key, listCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
@@ -90,7 +90,7 @@ func init() {
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
 		)
-		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrum for yesterday")
+		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrum for the previous weekday")
 		viper.BindPFlag(key, listCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
@@ -133,9 +133,9 @@ var listCmd = &cobra.Command{
 
 		switch {
 		case viper.GetBool(configKeyListTomorrow):
-			scrumDate = scrumDate.AddDate(0, 0, 1)
+			scrumDate = getTomorrow(scrumDate)
 		case viper.GetBool(configKeyListYesterday):
-			scrumDate = scrumDate.AddDate(0, 0, -1)
+			scrumDate = getYesterday(scrumDate)
 		}
 
 		return listScrummers(client, scrumDate)

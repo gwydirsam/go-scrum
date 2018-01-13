@@ -200,7 +200,7 @@ func init() {
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
 		)
-		getCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Get scrum for previous weekday")
+		getCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Get scrum for the previous weekday")
 		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
