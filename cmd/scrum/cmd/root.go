@@ -152,6 +152,27 @@ func init() {
 
 	{
 		const (
+			key          = configKeyCountry
+			longOpt      = "country"
+			shortOpt     = "C"
+			defaultValue = "us"
+			description  = "Country holiday schedule"
+		)
+
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const key = configKeyHolidays
+		defaultValue := joyentHolidays
+
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
 			key          = configKeyLogLevel
 			longOpt      = "log-level"
 			shortOpt     = "l"
@@ -259,6 +280,20 @@ func init() {
 		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$MANTA_USER", "Manta username to scrum as")
 		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_USER")
+	}
+
+	{
+		const (
+			key          = configKeyUseUTC
+			longName     = "utc"
+			shortName    = "Z"
+			defaultValue = false
+			description  = "Display times in UTC"
+		)
+
+		rootCmd.PersistentFlags().BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longName))
+		viper.SetDefault(key, defaultValue)
 	}
 
 	cobra.OnInitialize(initConfig)

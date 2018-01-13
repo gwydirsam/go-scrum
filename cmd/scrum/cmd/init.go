@@ -25,10 +25,10 @@ var initCmd = &cobra.Command{
 	Args: cobra.NoArgs,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// 1) Create a b file
-		// 2) Print the file to stdout if filename == "-"
-		// 3) Create the directory for ~/.config/scrum
 		var b bytes.Buffer
+		b.WriteString("[general]\n")
+		b.WriteString(fmt.Sprintf("#country = %+q\n", viper.GetString(configKeyCountry)))
+		b.WriteString("\n")
 		b.WriteString("[highlight]\n")
 		b.WriteString(fmt.Sprintf("#keyword   = %+q # exact match \"keyword\"\n", "red underline"))
 		b.WriteString(fmt.Sprintf("#\"substr~\" = %+q  # substring match \"substr\"\n", "italic green"))

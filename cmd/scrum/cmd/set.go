@@ -62,16 +62,16 @@ var setCmd = &cobra.Command{
 		numVacation := viper.GetInt(configKeySetVacationDays)
 
 		// Build file string
-		inputScrumDate, err := time.Parse(dateInputFormat, viper.GetString(configKeySetInputDate))
+		inputScrumDate, err := getDateInLocation(viper.GetString(configKeySetInputDate))
 		if err != nil {
-			return errors.Wrap(err, "unable to parse date")
+			return errors.Wrap(err, "unable to parse scrum date")
 		}
 
 		switch {
 		case viper.GetBool(configKeySetTomorrow):
-			inputScrumDate = getTomorrow(inputScrumDate)
+			inputScrumDate = getNextWeekday(inputScrumDate)
 		case viper.GetBool(configKeySetYesterday):
-			inputScrumDate = getYesterday(inputScrumDate)
+			inputScrumDate = getPreviousWeekday(inputScrumDate)
 		}
 
 		// create end date string for vacation and sick time

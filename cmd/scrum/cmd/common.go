@@ -45,6 +45,36 @@ func (sc *scrumClient) dumpMantaClientStats() {
 		Msg("stats")
 }
 
+// getDateInLocation takes a given date string and parses it according to whether or not
+// the user requested UTC or Local timezone processing.
+func getDateInLocation(dateStr string) (date time.Time, err error) {
+	if viper.GetBool(configKeyUseUTC) {
+		date, err = time.Parse(dateInputFormat, dateStr)
+	} else {
+		localLocation, err := time.LoadLocation("Local")
+		if err != nil {
+			return time.Now(), errors.Wrap(err, "unable to load local timezone information")
+		}
+
+		date, err = time.ParseInLocation(dateInputFormat, dateStr, localLocation)
+	}
+	if err != nil {
+		return time.Now(), errors.Wrap(err, "unable to parse date")
+	}
+
+	return date, nil
+}
+
+// getNextWeekday returns the next weekday.
+func getNextWeekday(scrumDate time.Time) time.Time {
+	return getWeekday(scrumDate, true)
+}
+
+// getPreviousWeekday returns the previous weekday.
+func getPreviousWeekday(scrumDate time.Time) time.Time {
+	return getWeekday(scrumDate, false)
+}
+
 func getScrumClient() (*scrumClient, error) {
 	mantaAccount := viper.GetString(configKeyMantaAccount)
 	mantaURL := viper.GetString(configKeyMantaURL)
@@ -73,22 +103,6 @@ func getScrumClient() (*scrumClient, error) {
 	}, nil
 }
 
-// getTomorrow returns the next weekday.
-//
-// TODO: teach getTomorrow to take in to consideration a vacation schedule.
-func getTomorrow(scrumDate time.Time) time.Time {
-	switch scrumDate.Weekday() {
-	case time.Friday:
-		return scrumDate.AddDate(0, 0, 3)
-	case time.Saturday:
-		return scrumDate.AddDate(0, 0, 2)
-	case time.Sunday:
-		return scrumDate.AddDate(0, 0, 1)
-	default:
-		return scrumDate.AddDate(0, 0, 1)
-	}
-}
-
 func getUser(userKey string) string {
 	switch {
 	case viper.IsSet(userKey):
@@ -111,20 +125,53 @@ func getUser(userKey string) string {
 	return ""
 }
 
-// getYesterday returns the previous weekday.
+// getWeekday is the internal helper function that either adds or subtracts a
+// weekday and tests to see if the next day in the sequence is a holiday or not
+// for the given country.
 //
-// TODO: teach getYesterday to take in to consideration a vacation schedule.
-func getYesterday(scrumDate time.Time) time.Time {
-	switch scrumDate.Weekday() {
-	case time.Monday:
-		return scrumDate.AddDate(0, 0, -3)
-	case time.Sunday:
-		return scrumDate.AddDate(0, 0, -2)
-	case time.Saturday:
-		return scrumDate.AddDate(0, 0, -1)
-	default:
-		return scrumDate.AddDate(0, 0, -1)
+// TODO: teach getWeekday to take in to consideration a vacation schedule.
+func getWeekday(scrumDate time.Time, nextDay bool) time.Time {
+	holidays := getHolidays()
+
+	myCountry := viper.GetString(configKeyCountry)
+
+NEXT_DATE:
+	for {
+		if nextDay {
+			scrumDate = scrumDate.AddDate(0, 0, 1)
+		} else {
+			scrumDate = scrumDate.AddDate(0, 0, -1)
+		}
+
+		switch scrumDate.Weekday() {
+		case time.Monday, time.Tuesday, time.Wednesday,
+			time.Thursday, time.Friday:
+
+			holiday, found := holidays[scrumDate]
+			if !found {
+				return scrumDate
+			}
+
+			countries := holiday.getCountries()
+			for _, country := range countries {
+				// Search for a date until my country is not in observance of a holiday.
+				if country == myCountry {
+					holidayName, err := holiday.getCountryHoliday(country)
+					if err != nil {
+						log.Warn().Err(err).Msg("unable to get a country's specific holiday")
+					}
+
+					log.Info().Str("country", country).Str("holiday", holidayName).Str("date", scrumDate.Format(dateInputFormat)).Msg("skipping holiday")
+					continue NEXT_DATE
+				}
+			}
+
+			// myCountry isn't observing a holiday on this day
+			return scrumDate
+		}
 	}
+
+	panic("unpossible")
 }
 
 func interpolateValue(val string) string {
