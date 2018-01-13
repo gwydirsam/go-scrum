@@ -245,9 +245,9 @@ var getCmd = &cobra.Command{
 
 		switch {
 		case viper.GetBool(configKeyGetTomorrow):
-			scrumDate = scrumDate.AddDate(0, 0, 1)
+			scrumDate = getTomorrow(scrumDate)
 		case viper.GetBool(configKeyGetYesterday):
-			scrumDate = scrumDate.AddDate(0, 0, -1)
+			scrumDate = getYesterday(scrumDate)
 		}
 
 		var w io.Writer
