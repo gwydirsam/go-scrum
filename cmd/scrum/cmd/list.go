@@ -133,11 +133,12 @@ func listScrummers(c *scrumClient, scrumDate time.Time) error {
 	scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout))
 
 	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
-	start := time.Now().UnixNano()
+	start := time.Now()
 	dirEnts, err := c.Dir().List(ctx, &storage.ListDirectoryInput{
 		DirectoryName: scrumPath,
 	})
-	elapsed := time.Now().UnixNano() - start
+	elapsed := time.Now().Sub(start)
+	log.Debug().Str("path", scrumPath).Str("duration", elapsed.String()).Msg("ListDirectory")
 	c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
 	c.listCalls++
 	if err != nil {

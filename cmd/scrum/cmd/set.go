@@ -89,11 +89,12 @@ var setCmd = &cobra.Command{
 
 			// Check if scrum exists
 			ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
-			start := time.Now().UnixNano()
+			start := time.Now()
 			_, err = c.Objects().Get(ctx, &storage.GetObjectInput{
 				ObjectPath: scrumPath,
 			})
-			elapsed := time.Now().UnixNano() - start
+			elapsed := time.Now().Sub(start)
+			log.Debug().Str("path", scrumPath).Str("duration", elapsed.String()).Str("context", "pre-set").Msg("GetObject")
 			c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
 			c.getCalls++
 
@@ -348,11 +349,12 @@ func putObject(c *scrumClient, scrumPath string, reader io.Reader) error {
 	}
 
 	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
-	defer func(start int64) {
-		elapsed := time.Now().UnixNano() - start
+	defer func(start time.Time) {
+		elapsed := time.Now().Sub(start)
+		log.Debug().Str("path", scrumPath).Str("duration", elapsed.String()).Msg("PutObject")
 		c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
 		c.putCalls++
-	}(time.Now().UnixNano())
+	}(time.Now())
 	if err := c.Objects().Put(ctx, putInput); err != nil {
 		return errors.Wrap(err, "unable to put object")
 	}
@@ -368,11 +370,12 @@ func unlinkObject(c *scrumClient, scrumPath string) error {
 	}
 
 	ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
-	start := time.Now().UnixNano()
+	start := time.Now()
 	if err := c.Objects().Delete(ctx, deleteInput); err != nil {
 		return errors.Wrap(err, "unable to delete object")
 	}
-	elapsed := time.Now().UnixNano() - start
+	elapsed := time.Now().Sub(start)
+	log.Debug().Str("path", scrumPath).Str("duration", elapsed.String()).Msg("DeleteObject")
 	c.Histogram.RecordValue(float64(elapsed) / float64(time.Second))
 	c.deleteCalls++
 
