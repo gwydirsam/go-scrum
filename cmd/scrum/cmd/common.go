@@ -39,6 +39,7 @@ func (sc *scrumClient) dumpMantaClientStats() {
 		Str("max", (time.Duration(sc.Histogram.Max()*float64(time.Second))).String()).
 		Str("mean", (time.Duration(sc.Histogram.Mean()*float64(time.Second))).String()).
 		Str("min", (time.Duration(sc.Histogram.Min()*float64(time.Second))).String()).
+		Str("total", (time.Duration(sc.Histogram.ApproxSum()*float64(time.Second))).String()).
 		Uint64("get-calls", sc.getCalls).
 		Uint64("list-calls", sc.listCalls).
 		Uint64("put-calls", sc.putCalls).
