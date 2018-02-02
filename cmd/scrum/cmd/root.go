@@ -284,9 +284,9 @@ func init() {
 
 	{
 		const key = configKeyScrumAccount
-		const longOpt, shortOpt = "scrum-account", "s"
+		const longOpt, shortOpt = "scrum-account", "B"
 		const defaultValue = "Joyent_Dev"
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "Manta account for scrum files")
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "Manta account for scrum board/files")
 		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.BindEnv(key, "SCRUM_ACCOUNT")
 	}
