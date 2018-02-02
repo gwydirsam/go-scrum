@@ -68,7 +68,7 @@
     "errors",
     "storage"
   ]
-  revision = "7f464ce455905ad9db55f458f1f8f50530ccfcf7"
+  revision = "2eeed277630b7bc1f9e05fab27977e8a591a2b3d"
 
 [[projects]]
   branch = "master"
@@ -122,19 +122,19 @@
   branch = "master"
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
-  revision = "96aac992fc8b1a4c83841a6c3e7178d20d989625"
+  revision = "b8a9be070da40449e501c3c4730a889e42d87a9e"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "16398bac157da96aa88f98a2df640c7f32af1da2"
-  version = "v1.0.1"
+  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/pkg/errors"
   packages = ["."]
-  revision = "e881fd58d78e04cf6d0de1217f8707c8cc2249bc"
+  revision = "30136e27e2ac8d167177e8a583aa4c3fea5be833"
 
 [[projects]]
   name = "github.com/rs/zerolog"
@@ -158,8 +158,8 @@
     ".",
     "mem"
   ]
-  revision = "ec3a3111d1e1bdff38a61e09d5a5f5e974905611"
-  version = "v1.0.1"
+  revision = "bb8f1927f2a9d3ab41c9340aa034f6b803f4359c"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -171,7 +171,7 @@
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "b95ab734e27d33e0d8fbabf71ca990568d4e2020"
+  revision = "3a7eb146bae5ebf9be598570234cde56c82d16cc"
 
 [[projects]]
   branch = "master"
@@ -198,11 +198,13 @@
     "curve25519",
     "ed25519",
     "ed25519/internal/edwards25519",
+    "internal/chacha20",
+    "poly1305",
     "ssh",
     "ssh/agent",
     "ssh/terminal"
   ]
-  revision = "13931e22f9e72ea58bb73048bc752b48c6d4d4ac"
+  revision = "1875d0a70c90e57f11972aefd42276df65e895b9"
 
 [[projects]]
   branch = "master"
@@ -211,7 +213,7 @@
     "unix",
     "windows"
   ]
-  revision = "810d7000345868fc619eb81f46307107118f4ae1"
+  revision = "37707fdb30a5b38865cfb95e5aab41707daec7fd"
 
 [[projects]]
   branch = "master"
@@ -235,6 +237,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d76ddc5e0f3e5727bf4959c4c5f940d116c8efb8e398084bba122e563f645969"
+  inputs-digest = "9085aa21c92d8b409867ed8861c362ff8167758a458a6e13724de49840e846ed"
   solver-name = "gps-cdcl"
   solver-version = 1

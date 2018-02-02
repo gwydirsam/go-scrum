@@ -236,7 +236,7 @@ func init() {
 	{
 		const key = configKeyMantaAccount
 		const longOpt, shortOpt = "manta-account", "A"
-		const defaultValue = "Joyent_Dev"
+		const defaultValue = "$MANTA_USER"
 		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "Manta account name")
 		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_ACCOUNT")
@@ -280,6 +280,15 @@ func init() {
 		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$MANTA_USER", "Manta username to scrum as")
 		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_USER")
+	}
+
+	{
+		const key = configKeyScrumAccount
+		const longOpt, shortOpt = "scrum-account", "B"
+		const defaultValue = "Joyent_Dev"
+		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "Manta account for scrum board/files")
+		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		viper.BindEnv(key, "SCRUM_ACCOUNT")
 	}
 
 	{

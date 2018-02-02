@@ -77,12 +77,9 @@ func getPreviousWeekday(scrumDate time.Time) time.Time {
 }
 
 func getScrumClient() (*scrumClient, error) {
-	mantaAccount := viper.GetString(configKeyMantaAccount)
-	mantaURL := viper.GetString(configKeyMantaURL)
-
 	input := authentication.SSHAgentSignerInput{
 		KeyID:       viper.GetString(configKeyMantaKeyID),
-		AccountName: mantaAccount,
+		AccountName: getUser(configKeyMantaAccount),
 	}
 	sshKeySigner, err := authentication.NewSSHAgentSigner(input)
 	if err != nil {
@@ -90,8 +87,8 @@ func getScrumClient() (*scrumClient, error) {
 	}
 
 	tsc, err := storage.NewClient(&triton.ClientConfig{
-		MantaURL:    mantaURL,
-		AccountName: mantaAccount,
+		MantaURL:    viper.GetString(configKeyMantaURL),
+		AccountName: getUser(configKeyScrumAccount),
 		Signers:     []authentication.Signer{sshKeySigner},
 	})
 	if err != nil {
