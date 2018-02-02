@@ -233,9 +233,9 @@ Global Flags:
   -S, --stats                    Log Manta client latency stats on exit (default true)
       --use-color                Use ASCII colors
   -Z, --utc                      Display times in UTC
-% scrum init -f -
+% scrum init -f - -Afirst.lastname --manta-key-id=8b:ad:f0:0d:de:ad:be:ef:de:ad:c0:de:ba:dd:ca:fe -Umyuser
 [general]
-#country = "us"
+country = "us"
 
 [highlight]
 #keyword   = "red underline" # exact match "keyword"
@@ -249,12 +249,12 @@ Global Flags:
 #use-color = true
 
 [manta]
-#account       = "first.lastname"
-#key-id        = "8b:ad:f0:0d:de:ad:be:ef:de:ad:c0:de:ba:dd:ca:fe"
-#scrum-account = "Joyent_Dev"
-#timeout       = "3s"
-#url           = "https://us-east.manta.joyent.com"
-#user          = "myuser"
+account       = "first.lastname"
+key-id        = "8b:ad:f0:0d:de:ad:be:ef:de:ad:c0:de:ba:dd:ca:fe"
+scrum-account = "Joyent_Dev"
+timeout       = "3s"
+url           = "https://us-east.manta.joyent.com"
+user          = "myuser"
 ```
 
 ## `direnv`
