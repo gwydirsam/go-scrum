@@ -34,6 +34,7 @@ const (
 	configKeyMantaTimeout = "manta.timeout"
 	configKeyMantaURL     = "manta.url"
 	configKeyMantaUser    = "manta.user"
+	configKeyScrumAccount = "manta.scrum-account"
 
 	configKeySetFilename     = "set.input-filename"
 	configKeySetForce        = "set.force"

@@ -41,16 +41,17 @@ var initCmd = &cobra.Command{
 		b.WriteString(fmt.Sprintf("#use-color = %t\n", viper.GetBool(configKeyLogTermColor)))
 		b.WriteString("\n")
 		b.WriteString("[manta]\n")
-		b.WriteString(fmt.Sprintf("#account = %+q\n", viper.GetString(configKeyMantaAccount)))
+		b.WriteString(fmt.Sprintf("#account       = %+q\n", getUser(configKeyMantaAccount)))
 
 		// TODO(seanc@): Pull this value out of the following in order to reduce the
 		// fiction associated with using Manta.
 		//
 		//   ssh-keygen -E md5 -lf ~/.ssh/id_rsa.pub | awk '{print $2}' | cut -d : -f 2-
-		b.WriteString(fmt.Sprintf("#key-id  = %+q\n", viper.GetString(configKeyMantaKeyID)))
-		b.WriteString(fmt.Sprintf("#timeout = %+q\n", viper.GetDuration(configKeyMantaTimeout)))
-		b.WriteString(fmt.Sprintf("#url     = %+q\n", viper.GetString(configKeyMantaURL)))
-		b.WriteString(fmt.Sprintf("#user    = %+q\n", viper.GetString(configKeyMantaUser)))
+		b.WriteString(fmt.Sprintf("#key-id        = %+q\n", viper.GetString(configKeyMantaKeyID)))
+		b.WriteString(fmt.Sprintf("#scrum-account = %+q\n", getUser(configKeyScrumAccount)))
+		b.WriteString(fmt.Sprintf("#timeout       = %+q\n", viper.GetDuration(configKeyMantaTimeout)))
+		b.WriteString(fmt.Sprintf("#url           = %+q\n", viper.GetString(configKeyMantaURL)))
+		b.WriteString(fmt.Sprintf("#user          = %+q\n", getUser(configKeyMantaUser)))
 
 		rawFilename := viper.GetString(configKeyInitFilename)
 		if rawFilename == "-" {
