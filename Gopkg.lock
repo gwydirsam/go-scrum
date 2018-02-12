@@ -68,7 +68,7 @@
     "errors",
     "storage"
   ]
-  revision = "2eeed277630b7bc1f9e05fab27977e8a591a2b3d"
+  revision = "72305f7ef3c379209f67e7a20367983a5e276c49"
 
 [[projects]]
   branch = "master"
@@ -116,7 +116,7 @@
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "b4575eea38cca1123ec2dc90c26529b5c5acfcff"
+  revision = "a4e142e9c047c904fa2f1e144d9a84e6133024bc"
 
 [[projects]]
   branch = "master"
@@ -153,6 +153,24 @@
   version = "v2.1.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/sean-/conswriter"
+  packages = ["."]
+  revision = "f5ae3917a627f1aab86eedaac41b153e4097e4e8"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/sean-/pager"
+  packages = ["."]
+  revision = "666be9bf53b5257ca07b4a16227df91e104c0519"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/sean-/sysexits"
+  packages = ["."]
+  revision = "598690305aaad5eed500b654afd2d1502b26450d"
+
+[[projects]]
   name = "github.com/spf13/afero"
   packages = [
     ".",
@@ -171,7 +189,7 @@
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "3a7eb146bae5ebf9be598570234cde56c82d16cc"
+  revision = "be77323fc05148ef091e83b3866c0d47c8e74a8b"
 
 [[projects]]
   branch = "master"
@@ -204,7 +222,7 @@
     "ssh/agent",
     "ssh/terminal"
   ]
-  revision = "1875d0a70c90e57f11972aefd42276df65e895b9"
+  revision = "9de5f2eaf759b4c4550b3db39fed2e9e5f86f45c"
 
 [[projects]]
   branch = "master"
@@ -226,7 +244,7 @@
     "unicode/cldr",
     "unicode/norm"
   ]
-  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  revision = "4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1"
 
 [[projects]]
   branch = "v2"
@@ -237,6 +255,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9085aa21c92d8b409867ed8861c362ff8167758a458a6e13724de49840e846ed"
+  inputs-digest = "fc20f0da1da7922bc03f9c254fcee81eb74c6d207fea8859bd143e5101a79c12"
   solver-name = "gps-cdcl"
   solver-version = 1

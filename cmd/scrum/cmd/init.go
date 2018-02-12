@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/gwydirsam/go-scrum/cmd/scrum/buildtime"
+	"github.com/gwydirsam/go-scrum/cmd/scrum/internal/buildtime"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -29,19 +29,26 @@ var initCmd = &cobra.Command{
 		b.WriteString("[general]\n")
 		b.WriteString(fmt.Sprintf("country  = %+q\n", viper.GetString(configKeyCountry)))
 		b.WriteString("\n")
+
+		b.WriteString("[scrum]\n")
+		b.WriteString(fmt.Sprintf("manta-account = %+q\n", getUser(configKeyScrumAccount)))
+		b.WriteString(fmt.Sprintf("username      = %+q\n", viper.GetString(configKeyScrumUsername)))
+		b.WriteString("\n")
+
 		b.WriteString("[highlight]\n")
 		b.WriteString(fmt.Sprintf("#keyword   = %+q # exact match \"keyword\"\n", "red underline"))
 		b.WriteString(fmt.Sprintf("#\"substr~\" = %+q  # substring match \"substr\"\n", "italic green"))
 		b.WriteString(fmt.Sprintf("#\"fuzzy~2\" = %+q  # match \"fuzzy\" with a distance of 2\n", "reverse blue"))
 		b.WriteString("\n")
+
 		b.WriteString("[log]\n")
 		b.WriteString(fmt.Sprintf("#format    = %+q\n", viper.GetString(configKeyLogFormat)))
 		b.WriteString(fmt.Sprintf("#level     = %+q\n", viper.GetString(configKeyLogLevel)))
 		b.WriteString(fmt.Sprintf("#stats     = %t\n", viper.GetBool(configKeyLogStats)))
 		b.WriteString(fmt.Sprintf("#use-color = %t\n", viper.GetBool(configKeyLogTermColor)))
 		b.WriteString("\n")
-		b.WriteString("[manta]\n")
 
+		b.WriteString("[manta]\n")
 		b.WriteString(fmt.Sprintf("account       = %+q\n", getUser(configKeyMantaAccount)))
 
 		// TODO(seanc@): Pull this value out of the following in order to reduce the
@@ -49,7 +56,6 @@ var initCmd = &cobra.Command{
 		//
 		//   ssh-keygen -E md5 -lf ~/.ssh/id_rsa.pub | awk '{print $2}' | cut -d : -f 2-
 		b.WriteString(fmt.Sprintf("key-id        = %+q\n", viper.GetString(configKeyMantaKeyID)))
-		b.WriteString(fmt.Sprintf("scrum-account = %+q\n", getUser(configKeyScrumAccount)))
 		b.WriteString(fmt.Sprintf("timeout       = %+q\n", viper.GetDuration(configKeyMantaTimeout)))
 		b.WriteString(fmt.Sprintf("url           = %+q\n", viper.GetString(configKeyMantaURL)))
 		b.WriteString(fmt.Sprintf("user          = %+q\n", getUser(configKeyMantaUser)))
@@ -98,8 +104,9 @@ func init() {
 		)
 		defaultValue := path.Join("~/", ".config", buildtime.PROGNAME, buildtime.PROGNAME+".toml")
 
-		initCmd.Flags().StringP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, initCmd.Flags().Lookup(longName))
+		flags := initCmd.Flags()
+		flags.StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 

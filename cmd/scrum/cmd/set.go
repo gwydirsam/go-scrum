@@ -85,7 +85,7 @@ var setCmd = &cobra.Command{
 		for i := 0; i < numDays; i++ {
 			scrumDate := inputScrumDate.AddDate(0, 0, i)
 
-			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeySetUsername))
+			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeyScrumUsername))
 
 			// Check if scrum exists
 			ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
@@ -204,8 +204,9 @@ func init() {
 		)
 		defaultValue := time.Now().Format(dateInputFormat)
 
-		setCmd.Flags().StringP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		flags := setCmd.Flags()
+		flags.StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -218,8 +219,9 @@ func init() {
 			description  = "Force overwrite of any present scrum"
 		)
 
-		setCmd.Flags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		flags := setCmd.Flags()
+		flags.BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -232,8 +234,9 @@ func init() {
 			description  = "Recycle scrum update for N days"
 		)
 
-		setCmd.Flags().UintP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		flags := setCmd.Flags()
+		flags.UintP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -246,8 +249,9 @@ func init() {
 			description  = "Sick leave for N days"
 		)
 
-		setCmd.Flags().UintP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		flags := setCmd.Flags()
+		flags.UintP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -257,19 +261,21 @@ func init() {
 			longOpt, shortOpt = "tomorrow", "t"
 			defaultValue      = false
 		)
-		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the next weekday")
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
+		flags := setCmd.Flags()
+		flags.BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the next weekday")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
 	{
 		const (
-			key               = configKeySetUsername
+			key               = configKeyScrumUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
 		)
-		setCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "Set scrum for specified user")
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
+		flags := setCmd.Flags()
+		flags.StringP(longOpt, shortOpt, defaultValue, "Set scrum for specified user")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -282,8 +288,9 @@ func init() {
 			description  = "Vacation for N days"
 		)
 
-		setCmd.Flags().UintP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		flags := setCmd.Flags()
+		flags.UintP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -296,8 +303,9 @@ func init() {
 			description  = "File to read scrum from"
 		)
 
-		setCmd.Flags().StringP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longName))
+		flags := setCmd.Flags()
+		flags.StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -307,12 +315,13 @@ func init() {
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
 		)
-		setCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the previous weekday")
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
+		flags := setCmd.Flags()
+		flags.BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the previous weekday")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 
 		// I don't want to generally be advertising that this is available.
-		setCmd.Flags().MarkHidden(longOpt)
+		flags.MarkHidden(longOpt)
 	}
 
 	{
@@ -321,12 +330,13 @@ func init() {
 			longOpt      = "rm"
 			defaultValue = false
 		)
-		setCmd.Flags().Bool(longOpt, defaultValue, "Remove scrum for a given day")
-		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
+		flags := setCmd.Flags()
+		flags.Bool(longOpt, defaultValue, "Remove scrum for a given day")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 
 		// I don't want to generally be advertising that this is available.
-		setCmd.Flags().MarkHidden(longOpt)
+		flags.MarkHidden(longOpt)
 	}
 
 	// Required Flags

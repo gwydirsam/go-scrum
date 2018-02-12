@@ -16,11 +16,11 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/gwydirsam/go-scrum/highlighter"
-	"github.com/gwydirsam/go-scrum/pager"
 	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/ryanuber/columnize"
+	"github.com/sean-/conswriter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
@@ -110,8 +110,9 @@ func init() {
 			description  = "Get scrum for all users"
 		)
 
-		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		flags := getCmd.Flags()
+		flags.BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -124,8 +125,9 @@ func init() {
 		)
 		defaultValue := time.Now().Format(dateInputFormat)
 
-		getCmd.Flags().StringP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		flags := getCmd.Flags()
+		flags.StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -138,8 +140,9 @@ func init() {
 		)
 		var defaultValue []string
 
-		getCmd.Flags().StringArrayP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		flags := getCmd.Flags()
+		flags.StringArrayP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -149,34 +152,21 @@ func init() {
 			longOpt, shortOpt = "tomorrow", "t"
 			defaultValue      = false
 		)
-		getCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Get scrum for the next weekday")
-		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
+		flags := getCmd.Flags()
+		flags.BoolP(longOpt, shortOpt, defaultValue, "Get scrum for the next weekday")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
 	{
 		const (
-			key               = configKeyGetUsername
+			key               = configKeyScrumUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
 		)
-		getCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "Get scrum for specified user")
-		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
-		viper.BindEnv(key, "USER")
-		viper.SetDefault(key, defaultValue)
-	}
-
-	{
-		const (
-			key          = configKeyGetUsePager
-			longName     = "use-pager"
-			shortName    = "P"
-			defaultValue = true
-			description  = "Use a pager to read the output (defaults to $PAGER, less(1), or more(1))"
-		)
-
-		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
+		flags := getCmd.Flags()
+		flags.StringP(longOpt, shortOpt, defaultValue, "Get scrum for specified user")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -186,8 +176,9 @@ func init() {
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
 		)
-		getCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "Get scrum for the previous weekday")
-		viper.BindPFlag(key, getCmd.Flags().Lookup(longOpt))
+		flags := getCmd.Flags()
+		flags.BoolP(longOpt, shortOpt, defaultValue, "Get scrum for the previous weekday")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -236,17 +227,7 @@ var getCmd = &cobra.Command{
 			scrumDate = getPreviousWeekday(scrumDate)
 		}
 
-		var w io.Writer
-		if viper.GetBool(configKeyGetUsePager) {
-			p, err := pager.New()
-			if err != nil {
-				return errors.Wrap(err, "unable to open pager")
-			}
-			defer pager.Wait()
-			w = p
-		} else {
-			w = os.Stdout
-		}
+		var w io.Writer = conswriter.GetTerminal()
 
 		inputTokens := viper.GetStringMap(configKeyGetHighlight)
 
@@ -327,7 +308,7 @@ var getCmd = &cobra.Command{
 		case viper.GetBool(configKeyGetAll):
 			return getAllScrum(w, client, scrumDate)
 		case !viper.GetBool(configKeyGetAll):
-			return getSingleScrum(w, client, scrumDate, getUser(configKeyGetUsername), false)
+			return getSingleScrum(w, client, scrumDate, getUser(configKeyScrumUsername), false)
 		default:
 			return errors.New("unsupported get mode")
 		}
