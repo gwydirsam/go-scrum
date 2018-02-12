@@ -156,7 +156,7 @@ func init() {
 
 	{
 		const (
-			key               = configKeyGetUsername
+			key               = configKeyScrumUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
 		)
@@ -302,7 +302,7 @@ var getCmd = &cobra.Command{
 		case viper.GetBool(configKeyGetAll):
 			return getAllScrum(w, client, scrumDate)
 		case !viper.GetBool(configKeyGetAll):
-			return getSingleScrum(w, client, scrumDate, getUser(configKeyGetUsername), false)
+			return getSingleScrum(w, client, scrumDate, getUser(configKeyScrumUsername), false)
 		default:
 			return errors.New("unsupported get mode")
 		}

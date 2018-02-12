@@ -85,7 +85,7 @@ var setCmd = &cobra.Command{
 		for i := 0; i < numDays; i++ {
 			scrumDate := inputScrumDate.AddDate(0, 0, i)
 
-			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeySetUsername))
+			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeyScrumUsername))
 
 			// Check if scrum exists
 			ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
@@ -264,7 +264,7 @@ func init() {
 
 	{
 		const (
-			key               = configKeySetUsername
+			key               = configKeyScrumUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
 		)

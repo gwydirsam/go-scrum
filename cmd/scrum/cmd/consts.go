@@ -8,12 +8,14 @@ const (
 	configKeyGetInputDate = "get.date"
 	configKeyGetTomorrow  = "get.tomorrow"
 	configKeyGetUsePager  = "get.use-pager"
-	configKeyGetUsername  = "get.username"
 	configKeyGetYesterday = "get.yesterday"
 
 	configKeyHolidays = "holidays"
 	configKeyCountry  = "general.country"
 	configKeyUseUTC   = "general.utc"
+
+	configKeyScrumAccount  = "scrum.manta-account"
+	configKeyScrumUsername = "scrum.username"
 
 	configKeyInitFilename = "init.config-file"
 
@@ -34,7 +36,6 @@ const (
 	configKeyMantaTimeout = "manta.timeout"
 	configKeyMantaURL     = "manta.url"
 	configKeyMantaUser    = "manta.user"
-	configKeyScrumAccount = "manta.scrum-account"
 
 	configKeySetFilename     = "set.input-filename"
 	configKeySetForce        = "set.force"
@@ -43,7 +44,6 @@ const (
 	configKeySetSickDays     = "set.sick-days"
 	configKeySetTomorrow     = "set.tomorrow"
 	configKeySetUnlinkDay    = "set.unlink-day"
-	configKeySetUsername     = "set.username"
 	configKeySetVacationDays = "set.vacation-days"
 	configKeySetYesterday    = "set.yesterday"
 
