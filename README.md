@@ -48,6 +48,7 @@ Available Commands:
   init        Generate an initial scrum configuration file
   list        List scrum information
   set         Set scrum information
+  version     Display scrum version and build information
 
 Flags:
   -C, --country string           Country holiday schedule (default "us")
@@ -61,7 +62,8 @@ Flags:
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -B, --scrum-account string     Manta account for scrum board/files (default "Joyent_Dev")
   -S, --stats                    Log Manta client latency stats on exit (default true)
-      --use-color                Use ASCII colors
+      --use-color                Use ASCII colors (default true)
+  -P, --use-pager                Use a $PAGER to read output (defaults to $PAGER, less(1), or more(1)) (default true)
   -Z, --utc                      Display times in UTC
 
 Use "scrum [command] --help" for more information about a command.
@@ -84,11 +86,10 @@ Examples:
 
 Flags:
   -a, --all                     Get scrum for all users
-  -D, --date string             Date for scrum (default "2017-12-11")
+  -D, --date string             Date for scrum (default "2018-02-12")
   -h, --help                    help for get
   -H, --highlight stringArray   Highlight words definition
   -t, --tomorrow                Get scrum for the next weekday
-  -P, --use-pager               Use a pager to read the output (defaults to $PAGER, less(1), or more(1)) (default true)
   -u, --user string             Get scrum for specified user (default "$USER")
   -y, --yesterday               Get scrum for the previous weekday
 
@@ -103,7 +104,8 @@ Global Flags:
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -B, --scrum-account string     Manta account for scrum board/files (default "Joyent_Dev")
   -S, --stats                    Log Manta client latency stats on exit (default true)
-      --use-color                Use ASCII colors
+      --use-color                Use ASCII colors (default true)
+  -P, --use-pager                Use a $PAGER to read output (defaults to $PAGER, less(1), or more(1)) (default true)
   -Z, --utc                      Display times in UTC
 ```
 
@@ -141,7 +143,7 @@ Examples:
   $ scrum set -u other.username -t -i tomorrow.md # Set other.username's scrum for tomorrow
 
 Flags:
-  -D, --date string     Date for scrum (default "2017-12-11")
+  -D, --date string     Date for scrum (default "2018-02-12")
   -d, --days uint       Recycle scrum update for N days
   -i, --file string     File to read scrum from
   -f, --force           Force overwrite of any present scrum
@@ -162,7 +164,8 @@ Global Flags:
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -B, --scrum-account string     Manta account for scrum board/files (default "Joyent_Dev")
   -S, --stats                    Log Manta client latency stats on exit (default true)
-      --use-color                Use ASCII colors
+      --use-color                Use ASCII colors (default true)
+  -P, --use-pager                Use a $PAGER to read output (defaults to $PAGER, less(1), or more(1)) (default true)
   -Z, --utc                      Display times in UTC
 ```
 
@@ -181,7 +184,7 @@ Examples:
 
 Flags:
   -a, --all           List all metadata details (default true)
-  -D, --date string   Date for scrum (default "2017-12-11")
+  -D, --date string   Date for scrum (default "2018-02-12")
   -h, --help          help for list
   -t, --tomorrow      List scrums for the next weekday
   -1, --usernames     List usernames only
@@ -198,7 +201,8 @@ Global Flags:
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -B, --scrum-account string     Manta account for scrum board/files (default "Joyent_Dev")
   -S, --stats                    Log Manta client latency stats on exit (default true)
-      --use-color                Use ASCII colors
+      --use-color                Use ASCII colors (default true)
+  -P, --use-pager                Use a $PAGER to read output (defaults to $PAGER, less(1), or more(1)) (default true)
   -Z, --utc                      Display times in UTC
 ```
 
@@ -231,7 +235,8 @@ Global Flags:
   -U, --manta-user string        Manta username to scrum as (default "$MANTA_USER")
   -B, --scrum-account string     Manta account for scrum board/files (default "Joyent_Dev")
   -S, --stats                    Log Manta client latency stats on exit (default true)
-      --use-color                Use ASCII colors
+      --use-color                Use ASCII colors (default true)
+  -P, --use-pager                Use a $PAGER to read output (defaults to $PAGER, less(1), or more(1)) (default true)
   -Z, --utc                      Display times in UTC
 % scrum init -f - -Afirst.lastname --manta-key-id=8b:ad:f0:0d:de:ad:be:ef:de:ad:c0:de:ba:dd:ca:fe -Umyuser
 [general]
