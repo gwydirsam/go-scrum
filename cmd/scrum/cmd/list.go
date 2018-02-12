@@ -26,8 +26,9 @@ func init() {
 			description  = "List usernames only"
 		)
 
-		listCmd.Flags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, listCmd.Flags().Lookup(longName))
+		flags := listCmd.Flags()
+		flags.BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -40,8 +41,9 @@ func init() {
 			description  = "List all metadata details"
 		)
 
-		listCmd.Flags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, listCmd.Flags().Lookup(longName))
+		flags := listCmd.Flags()
+		flags.BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -54,8 +56,9 @@ func init() {
 		)
 		defaultValue := time.Now().Format(dateInputFormat)
 
-		listCmd.Flags().StringP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, listCmd.Flags().Lookup(longName))
+		flags := listCmd.Flags()
+		flags.StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -65,8 +68,9 @@ func init() {
 			longOpt, shortOpt = "tomorrow", "t"
 			defaultValue      = false
 		)
-		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrums for the next weekday")
-		viper.BindPFlag(key, listCmd.Flags().Lookup(longOpt))
+		flags := listCmd.Flags()
+		flags.BoolP(longOpt, shortOpt, defaultValue, "List scrums for the next weekday")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -76,8 +80,9 @@ func init() {
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
 		)
-		listCmd.Flags().BoolP(longOpt, shortOpt, defaultValue, "List scrum for the previous weekday")
-		viper.BindPFlag(key, listCmd.Flags().Lookup(longOpt))
+		flags := listCmd.Flags()
+		flags.BoolP(longOpt, shortOpt, defaultValue, "List scrum for the previous weekday")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 

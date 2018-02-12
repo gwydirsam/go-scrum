@@ -159,8 +159,9 @@ func init() {
 			description  = "Country holiday schedule"
 		)
 
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -180,8 +181,9 @@ func init() {
 			description  = "Change the log level being sent to stdout"
 		)
 
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 
 		// Initialize the log levels immediately.  initLogLevels() will be called
@@ -198,8 +200,9 @@ func init() {
 		)
 
 		defaultValue := _LogFormatAuto.String()
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -210,8 +213,9 @@ func init() {
 			defaultValue      = true
 			description       = "Log Manta client latency stats on exit"
 		)
-		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.BoolP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -228,8 +232,9 @@ func init() {
 			defaultValue = true
 		}
 
-		rootCmd.PersistentFlags().BoolP(longOpt, shortOpt, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.BoolP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -237,8 +242,9 @@ func init() {
 		const key = configKeyMantaAccount
 		const longOpt, shortOpt = "manta-account", "A"
 		const defaultValue = "$MANTA_USER"
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "Manta account name")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, defaultValue, "Manta account name")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_ACCOUNT")
 	}
 
@@ -246,8 +252,9 @@ func init() {
 		const key = configKeyMantaKeyID
 		const longOpt, shortOpt = "manta-key-id", ""
 		const defaultValue = ""
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "SSH key fingerprint (default is $MANTA_KEY_ID)")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, defaultValue, "SSH key fingerprint (default is $MANTA_KEY_ID)")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_KEY_ID")
 	}
 
@@ -260,8 +267,9 @@ func init() {
 			defaultValue = 3 * time.Second
 		)
 
-		rootCmd.PersistentFlags().DurationP(longOpt, shortOpt, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.DurationP(longOpt, shortOpt, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -269,16 +277,18 @@ func init() {
 		const key = configKeyMantaURL
 		const longOpt, shortOpt = "manta-url", "E"
 		const defaultValue = "https://us-east.manta.joyent.com"
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "URL of the Manta instance (default is $MANTA_URL)")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, defaultValue, "URL of the Manta instance (default is $MANTA_URL)")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_URL")
 	}
 
 	{
 		const key = configKeyMantaUser
 		const longOpt, shortOpt = "manta-user", "U"
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, "$MANTA_USER", "Manta username to scrum as")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, "$MANTA_USER", "Manta username to scrum as")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.BindEnv(key, "MANTA_USER")
 	}
 
@@ -286,8 +296,9 @@ func init() {
 		const key = configKeyScrumAccount
 		const longOpt, shortOpt = "scrum-account", "B"
 		const defaultValue = "Joyent_Dev"
-		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "Manta account for scrum board/files")
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, defaultValue, "Manta account for scrum board/files")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.BindEnv(key, "SCRUM_ACCOUNT")
 	}
 
@@ -315,8 +326,9 @@ func init() {
 			description  = "Display times in UTC"
 		)
 
-		rootCmd.PersistentFlags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longName))
+		flags := rootCmd.PersistentFlags()
+		flags.BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 

@@ -104,8 +104,9 @@ func init() {
 		)
 		defaultValue := path.Join("~/", ".config", buildtime.PROGNAME, buildtime.PROGNAME+".toml")
 
-		initCmd.Flags().StringP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, initCmd.Flags().Lookup(longName))
+		flags := initCmd.Flags()
+		flags.StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
 
