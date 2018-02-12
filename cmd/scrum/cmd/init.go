@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/gwydirsam/go-scrum/cmd/scrum/buildtime"
+	"github.com/gwydirsam/go-scrum/cmd/scrum/internal/buildtime"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"

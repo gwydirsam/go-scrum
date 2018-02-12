@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/gops/agent"
-	"github.com/gwydirsam/go-scrum/cmd/scrum/buildtime"
+	"github.com/gwydirsam/go-scrum/cmd/scrum/internal/buildtime"
 	isatty "github.com/mattn/go-isatty"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
