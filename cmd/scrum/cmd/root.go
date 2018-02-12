@@ -65,7 +65,7 @@ func Execute() error {
 		}
 
 		if logFmt == _LogFormatAuto {
-			if isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd()) {
+			if isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd()) {
 				logFmt = _LogFormatHuman
 			} else {
 				logFmt = _LogFormatZerolog
@@ -228,7 +228,7 @@ func init() {
 		)
 
 		defaultValue := false
-		if isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd()) {
+		if isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd()) {
 			defaultValue = true
 		}
 
