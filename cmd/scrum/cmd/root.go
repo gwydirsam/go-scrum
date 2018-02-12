@@ -40,7 +40,7 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() error {
-	conswriter.UsePager(viper.GetBool(configKeyGetUsePager))
+	conswriter.UsePager(viper.GetBool(configKeyUsePager))
 
 	logLevel, err := initLogLevels()
 	if err != nil {
@@ -293,11 +293,11 @@ func init() {
 
 	{
 		const (
-			key          = configKeyGetUsePager
+			key          = configKeyUsePager
 			longName     = "use-pager"
 			shortName    = "P"
 			defaultValue = true
-			description  = "Use a pager to read the output (defaults to $PAGER, less(1), or more(1))"
+			description  = "Use a $PAGER to read output (defaults to $PAGER, less(1), or more(1))"
 		)
 
 		flags := rootCmd.PersistentFlags()

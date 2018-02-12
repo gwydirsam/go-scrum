@@ -7,11 +7,11 @@ const (
 	configKeyGetHighlight = "highlight"
 	configKeyGetInputDate = "get.date"
 	configKeyGetTomorrow  = "get.tomorrow"
-	configKeyGetUsePager  = "get.use-pager"
 	configKeyGetYesterday = "get.yesterday"
 
 	configKeyHolidays = "holidays"
 	configKeyCountry  = "general.country"
+	configKeyUsePager = "general.use-pager"
 	configKeyUseUTC   = "general.utc"
 
 	configKeyScrumAccount  = "scrum.manta-account"
