@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"os"
 	"path"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"github.com/sean-/conswriter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -155,7 +155,7 @@ func listScrummers(c *scrumClient, scrumDate time.Time) error {
 		return nil
 	}
 
-	w := bufio.NewWriter(os.Stdout)
+	w := bufio.NewWriter(conswriter.GetTerminal())
 	defer w.Flush()
 
 	switch {
