@@ -270,7 +270,6 @@ func init() {
 		)
 		setCmd.Flags().StringP(longOpt, shortOpt, defaultValue, "Set scrum for specified user")
 		viper.BindPFlag(key, setCmd.Flags().Lookup(longOpt))
-		viper.BindEnv(key, "USER")
 		viper.SetDefault(key, defaultValue)
 	}
 
