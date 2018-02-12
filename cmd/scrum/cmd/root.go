@@ -105,11 +105,13 @@ var rootCmd = &cobra.Command{
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute() error {
 	if err := rootCmd.Execute(); err != nil {
 		log.Error().Err(err).Msg("")
-		os.Exit(1)
+		return err
 	}
+
+	return nil
 }
 
 // initConfig reads in config file and ENV variables if set.
