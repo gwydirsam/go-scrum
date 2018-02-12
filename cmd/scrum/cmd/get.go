@@ -16,11 +16,11 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/gwydirsam/go-scrum/highlighter"
-	"github.com/gwydirsam/go-scrum/pager"
 	"github.com/joyent/triton-go/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/ryanuber/columnize"
+	"github.com/sean-/conswriter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
@@ -167,20 +167,6 @@ func init() {
 
 	{
 		const (
-			key          = configKeyGetUsePager
-			longName     = "use-pager"
-			shortName    = "P"
-			defaultValue = true
-			description  = "Use a pager to read the output (defaults to $PAGER, less(1), or more(1))"
-		)
-
-		getCmd.Flags().BoolP(longName, shortName, defaultValue, description)
-		viper.BindPFlag(key, getCmd.Flags().Lookup(longName))
-		viper.SetDefault(key, defaultValue)
-	}
-
-	{
-		const (
 			key               = configKeyGetYesterday
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
@@ -235,17 +221,7 @@ var getCmd = &cobra.Command{
 			scrumDate = getPreviousWeekday(scrumDate)
 		}
 
-		var w io.Writer
-		if viper.GetBool(configKeyGetUsePager) {
-			p, err := pager.New()
-			if err != nil {
-				return errors.Wrap(err, "unable to open pager")
-			}
-			defer pager.Wait()
-			w = p
-		} else {
-			w = os.Stdout
-		}
+		var w io.Writer = conswriter.GetTerminal()
 
 		inputTokens := viper.GetStringMap(configKeyGetHighlight)
 

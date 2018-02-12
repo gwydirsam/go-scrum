@@ -16,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/sean-/conswriter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -34,78 +35,75 @@ var rootCmd = &cobra.Command{
   $ scrum set -i today.md # Set my scrum using today.md
   $ scrum list            # List scrummers for the day`,
 	Args: cobra.NoArgs,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		// Perform input validation
-
-		logLevel, err := initLogLevels()
-		if err != nil {
-			return errors.Wrap(err, "unable to initialize log levels")
-		}
-
-		// zerolog was initialized with sane defaults.  Re-initialize logging with
-		// user-supplied configuration parameters
-		{
-			// os.Stderr isn't guaranteed to be thread-safe, wrap in a sync writer.
-			// Files are guaranteed to be safe, terminals are not.
-			var logWriter io.Writer
-			if isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd()) {
-				logWriter = zerolog.SyncWriter(os.Stderr)
-			} else {
-				logWriter = os.Stderr
-			}
-
-			logFmt, err := getLogFormat()
-			if err != nil {
-				return errors.Wrap(err, "unable to parse log format")
-			}
-
-			if logFmt == _LogFormatAuto {
-				if isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd()) {
-					logFmt = _LogFormatHuman
-				} else {
-					logFmt = _LogFormatZerolog
-				}
-			}
-
-			var zlog zerolog.Logger
-			switch logFmt {
-			case _LogFormatZerolog:
-				zlog = zerolog.New(logWriter).With().Timestamp().Logger()
-			case _LogFormatHuman:
-				useColor := viper.GetBool(configKeyLogTermColor)
-				w := zerolog.ConsoleWriter{
-					Out:     logWriter,
-					NoColor: !useColor,
-				}
-				zlog = zerolog.New(w).With().Timestamp().Logger()
-			default:
-				return fmt.Errorf("unsupported log format: %q")
-			}
-
-			log.Logger = zlog
-
-			stdlog.SetFlags(0)
-			stdlog.SetOutput(zlog)
-			stdLogger = &stdlog.Logger{}
-			if logLevel != _LogLevelDebug {
-				stdLogger.SetOutput(ioutil.Discard)
-			} else {
-				stdLogger.SetOutput(zlog)
-			}
-		}
-
-		// Always enable the agent
-		if err := agent.Listen(nil); err != nil {
-			log.Fatal().Err(err).Msg("unable to start gops agent")
-		}
-
-		return nil
-	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() error {
+	conswriter.UsePager(viper.GetBool(configKeyGetUsePager))
+
+	logLevel, err := initLogLevels()
+	if err != nil {
+		return errors.Wrap(err, "unable to initialize log levels")
+	}
+
+	// zerolog was initialized with sane defaults.  Re-initialize logging with
+	// user-supplied configuration parameters
+	{
+		// os.Stderr isn't guaranteed to be thread-safe, wrap in a sync writer.
+		// Files are guaranteed to be safe, terminals are not.
+		var logWriter io.Writer
+		if isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd()) {
+			logWriter = conswriter.GetTerminal()
+		} else {
+			logWriter = os.Stderr
+		}
+
+		logFmt, err := getLogFormat()
+		if err != nil {
+			return errors.Wrap(err, "unable to parse log format")
+		}
+
+		if logFmt == _LogFormatAuto {
+			if isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd()) {
+				logFmt = _LogFormatHuman
+			} else {
+				logFmt = _LogFormatZerolog
+			}
+		}
+
+		var zlog zerolog.Logger
+		switch logFmt {
+		case _LogFormatZerolog:
+			zlog = zerolog.New(logWriter).With().Timestamp().Logger()
+		case _LogFormatHuman:
+			useColor := viper.GetBool(configKeyLogTermColor)
+			w := zerolog.ConsoleWriter{
+				Out:     logWriter,
+				NoColor: !useColor,
+			}
+			zlog = zerolog.New(w).With().Timestamp().Logger()
+		default:
+			return fmt.Errorf("unsupported log format: %q")
+		}
+
+		log.Logger = zlog
+
+		stdlog.SetFlags(0)
+		stdlog.SetOutput(zlog)
+		stdLogger = &stdlog.Logger{}
+		if logLevel != _LogLevelDebug {
+			stdLogger.SetOutput(ioutil.Discard)
+		} else {
+			stdLogger.SetOutput(zlog)
+		}
+	}
+
+	// Always enable the agent
+	if err := agent.Listen(nil); err != nil {
+		log.Fatal().Err(err).Msg("unable to start gops agent")
+	}
+
 	if err := rootCmd.Execute(); err != nil {
 		log.Error().Err(err).Msg("")
 		return err
@@ -291,6 +289,21 @@ func init() {
 		rootCmd.PersistentFlags().StringP(longOpt, shortOpt, defaultValue, "Manta account for scrum board/files")
 		viper.BindPFlag(key, rootCmd.PersistentFlags().Lookup(longOpt))
 		viper.BindEnv(key, "SCRUM_ACCOUNT")
+	}
+
+	{
+		const (
+			key          = configKeyGetUsePager
+			longName     = "use-pager"
+			shortName    = "P"
+			defaultValue = true
+			description  = "Use a pager to read the output (defaults to $PAGER, less(1), or more(1))"
+		)
+
+		flags := rootCmd.PersistentFlags()
+		flags.BoolP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
+		viper.SetDefault(key, defaultValue)
 	}
 
 	{
