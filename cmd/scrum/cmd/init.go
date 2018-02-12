@@ -10,6 +10,7 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"github.com/sean-/conswriter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -62,7 +63,7 @@ var initCmd = &cobra.Command{
 
 		rawFilename := viper.GetString(configKeyInitFilename)
 		if rawFilename == "-" {
-			b.WriteTo(os.Stdout)
+			b.WriteTo(conswriter.GetTerminal())
 			return nil
 		}
 
