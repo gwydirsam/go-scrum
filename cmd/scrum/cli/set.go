@@ -85,7 +85,7 @@ var setCmd = &cobra.Command{
 		for i := 0; i < numDays; i++ {
 			scrumDate := inputScrumDate.AddDate(0, 0, i)
 
-			username := interpolateUserEnvVar(viper.GetString(configKeyScrumAccount))
+			username := interpolateUserEnvVar(viper.GetString(configKeyScrumUsername))
 			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), username)
 
 			// Check if scrum exists
