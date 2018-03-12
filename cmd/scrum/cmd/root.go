@@ -100,7 +100,7 @@ func Execute() error {
 	}
 
 	// Always enable the agent
-	if err := agent.Listen(nil); err != nil {
+	if err := agent.Listen(agent.Options{}); err != nil {
 		log.Fatal().Err(err).Msg("unable to start gops agent")
 	}
 
@@ -159,7 +159,6 @@ func init() {
 		flags := rootCmd.PersistentFlags()
 		flags.StringP(longOpt, shortOpt, defaultValue, description)
 		viper.BindPFlag(key, flags.Lookup(longOpt))
-		viper.SetDefault(key, defaultValue)
 	}
 
 	{
@@ -181,7 +180,6 @@ func init() {
 		flags := rootCmd.PersistentFlags()
 		flags.StringP(longOpt, shortOpt, defaultValue, description)
 		viper.BindPFlag(key, flags.Lookup(longOpt))
-		viper.SetDefault(key, defaultValue)
 
 		// Initialize the log levels immediately.  initLogLevels() will be called
 		// again later during the standard initialization procedure.
@@ -200,7 +198,6 @@ func init() {
 		flags := rootCmd.PersistentFlags()
 		flags.StringP(longOpt, shortOpt, defaultValue, description)
 		viper.BindPFlag(key, flags.Lookup(longOpt))
-		viper.SetDefault(key, defaultValue)
 	}
 
 	{
@@ -213,7 +210,6 @@ func init() {
 		flags := rootCmd.PersistentFlags()
 		flags.BoolP(longOpt, shortOpt, defaultValue, description)
 		viper.BindPFlag(key, flags.Lookup(longOpt))
-		viper.SetDefault(key, defaultValue)
 	}
 
 	{
@@ -232,7 +228,6 @@ func init() {
 		flags := rootCmd.PersistentFlags()
 		flags.BoolP(longOpt, shortOpt, defaultValue, description)
 		viper.BindPFlag(key, flags.Lookup(longOpt))
-		viper.SetDefault(key, defaultValue)
 	}
 
 	{
@@ -267,7 +262,6 @@ func init() {
 		flags := rootCmd.PersistentFlags()
 		flags.DurationP(longOpt, shortOpt, defaultValue, description)
 		viper.BindPFlag(key, flags.Lookup(longOpt))
-		viper.SetDefault(key, defaultValue)
 	}
 
 	{
@@ -337,7 +331,6 @@ func init() {
 		flags := rootCmd.PersistentFlags()
 		flags.BoolP(longName, shortName, defaultValue, description)
 		viper.BindPFlag(key, flags.Lookup(longName))
-		viper.SetDefault(key, defaultValue)
 	}
 }
 
