@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/gwydirsam/go-scrum/cmd/scrum/cmd"
+	"github.com/gwydirsam/go-scrum/cmd/scrum/cli"
 	"github.com/gwydirsam/go-scrum/cmd/scrum/internal/buildtime"
 	"github.com/rs/zerolog/log"
 	"github.com/sean-/conswriter"
@@ -28,7 +28,7 @@ func realMain() int {
 		p.Wait()
 	}()
 
-	if err := cmd.Execute(); err != nil {
+	if err := cli.Execute(); err != nil {
 		log.Error().Err(err).Msg("unable to run")
 		return 1
 	}
