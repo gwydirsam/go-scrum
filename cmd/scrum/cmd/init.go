@@ -32,7 +32,7 @@ var initCmd = &cobra.Command{
 		b.WriteString("\n")
 
 		b.WriteString("[scrum]\n")
-		b.WriteString(fmt.Sprintf("manta-account = %+q\n", getUser(configKeyScrumAccount)))
+		b.WriteString(fmt.Sprintf("manta-account = %+q\n", interpolateUserEnvVar(viper.GetString(configKeyScrumAccount))))
 		b.WriteString(fmt.Sprintf("username      = %+q\n", viper.GetString(configKeyScrumUsername)))
 		b.WriteString("\n")
 
@@ -50,7 +50,7 @@ var initCmd = &cobra.Command{
 		b.WriteString("\n")
 
 		b.WriteString("[manta]\n")
-		b.WriteString(fmt.Sprintf("account       = %+q\n", getUser(configKeyMantaAccount)))
+		b.WriteString(fmt.Sprintf("account       = %+q\n", interpolateMantaUserEnvVar(viper.GetString(configKeyMantaAccount))))
 
 		// TODO(seanc@): Pull this value out of the following in order to reduce the
 		// fiction associated with using Manta.
@@ -59,7 +59,7 @@ var initCmd = &cobra.Command{
 		b.WriteString(fmt.Sprintf("key-id        = %+q\n", viper.GetString(configKeyMantaKeyID)))
 		b.WriteString(fmt.Sprintf("timeout       = %+q\n", viper.GetDuration(configKeyMantaTimeout)))
 		b.WriteString(fmt.Sprintf("url           = %+q\n", viper.GetString(configKeyMantaURL)))
-		b.WriteString(fmt.Sprintf("user          = %+q\n", getUser(configKeyMantaUser)))
+		b.WriteString(fmt.Sprintf("user          = %+q\n", interpolateMantaUserEnvVar(viper.GetString(configKeyMantaUser))))
 
 		rawFilename := viper.GetString(configKeyInitFilename)
 		if rawFilename == "-" {

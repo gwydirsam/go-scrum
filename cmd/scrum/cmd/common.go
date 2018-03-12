@@ -79,7 +79,7 @@ func getPreviousWeekday(scrumDate time.Time) time.Time {
 func getScrumClient() (*scrumClient, error) {
 	input := authentication.SSHAgentSignerInput{
 		KeyID:       viper.GetString(configKeyMantaKeyID),
-		AccountName: getUser(configKeyMantaAccount),
+		AccountName: interpolateMantaUserEnvVar(viper.GetString(configKeyMantaAccount)),
 	}
 	sshKeySigner, err := authentication.NewSSHAgentSigner(input)
 	if err != nil {
@@ -88,7 +88,7 @@ func getScrumClient() (*scrumClient, error) {
 
 	tsc, err := storage.NewClient(&triton.ClientConfig{
 		MantaURL:    viper.GetString(configKeyMantaURL),
-		AccountName: getUser(configKeyScrumAccount),
+		AccountName: interpolateMantaUserEnvVar(viper.GetString(configKeyScrumAccount)),
 		Signers:     []authentication.Signer{sshKeySigner},
 	})
 	if err != nil {
@@ -99,28 +99,6 @@ func getScrumClient() (*scrumClient, error) {
 		StorageClient: tsc,
 		Histogram:     circonusllhist.New(),
 	}, nil
-}
-
-func getUser(userKey string) string {
-	switch {
-	case viper.IsSet(userKey):
-		return interpolateValue(viper.GetString(userKey))
-	case viper.IsSet(configKeyMantaUser):
-		return interpolateValue(viper.GetString(configKeyMantaUser))
-	}
-
-	user := viper.GetString(configKeyMantaUser)
-	if user != "" {
-		return interpolateValue(user)
-	}
-
-	user = viper.GetString(userKey)
-	if user != "" {
-		return interpolateValue(user)
-	}
-
-	log.Warn().Msgf("unable to detect a username, please set %q or %q in %q", userKey, configKeyMantaUser, viper.ConfigFileUsed)
-	return ""
 }
 
 // getWeekday is the internal helper function that either adds or subtracts a
@@ -172,10 +150,17 @@ NEXT_DATE:
 	panic("unpossible")
 }
 
-func interpolateValue(val string) string {
+func interpolateMantaUserEnvVar(val string) string {
 	switch val {
 	case "$MANTA_USER":
 		return os.Getenv("MANTA_USER")
+	}
+
+	return val
+}
+
+func interpolateUserEnvVar(val string) string {
+	switch val {
 	case "$USER":
 		return os.Getenv("USER")
 	}

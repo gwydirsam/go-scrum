@@ -85,7 +85,8 @@ var setCmd = &cobra.Command{
 		for i := 0; i < numDays; i++ {
 			scrumDate := inputScrumDate.AddDate(0, 0, i)
 
-			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), getUser(configKeyScrumUsername))
+			username := interpolateUserEnvVar(viper.GetString(configKeyScrumAccount))
+			scrumPath := path.Join("stor", "scrum", scrumDate.Format(scrumDateLayout), username)
 
 			// Check if scrum exists
 			ctx, _ := context.WithTimeout(context.Background(), viper.GetDuration(configKeyMantaTimeout))
@@ -263,18 +264,6 @@ func init() {
 		)
 		flags := setCmd.Flags()
 		flags.BoolP(longOpt, shortOpt, defaultValue, "Set scrum for the next weekday")
-		viper.BindPFlag(key, flags.Lookup(longOpt))
-		viper.SetDefault(key, defaultValue)
-	}
-
-	{
-		const (
-			key               = configKeyScrumUsername
-			longOpt, shortOpt = "user", "u"
-			defaultValue      = "$USER"
-		)
-		flags := setCmd.Flags()
-		flags.StringP(longOpt, shortOpt, defaultValue, "Set scrum for specified user")
 		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}

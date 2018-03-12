@@ -112,8 +112,13 @@ func Execute() error {
 	return nil
 }
 
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
+func init() {
+	// Initialize viper so that when we call initLogLevels() we can pull a value
+	// from a config file.
+	viper.SetConfigName(buildtime.PROGNAME)
+	viper.AddConfigPath(path.Join("$HOME", ".config", buildtime.PROGNAME))
+	viper.AddConfigPath(".")
+
 	_, _ = initLogLevels()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -123,14 +128,6 @@ func initConfig() {
 			log.Warn().Err(err).Msg("unable to read config file")
 		}
 	}
-}
-
-func init() {
-	// Initialize viper so that when ew call initLogLevels() we can pull a value
-	// from a config file.
-	viper.SetConfigName(buildtime.PROGNAME)
-	viper.AddConfigPath(path.Join("$HOME", ".config", buildtime.PROGNAME))
-	viper.AddConfigPath(".")
 
 	// os.Stderr isn't guaranteed to be thread-safe, wrap in a sync writer.  Files
 	// are guaranteed to be safe, terminals are not.
@@ -314,6 +311,17 @@ func init() {
 		flags := rootCmd.PersistentFlags()
 		flags.BoolP(longName, shortName, defaultValue, description)
 		viper.BindPFlag(key, flags.Lookup(longName))
+	}
+
+	{
+		const (
+			key               = configKeyScrumUsername
+			longOpt, shortOpt = "user", "u"
+			defaultValue      = "$USER"
+		)
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longOpt, shortOpt, defaultValue, "Scrum for specified user")
+		viper.BindPFlag(key, flags.Lookup(longOpt))
 		viper.SetDefault(key, defaultValue)
 	}
 
@@ -331,8 +339,6 @@ func init() {
 		viper.BindPFlag(key, flags.Lookup(longName))
 		viper.SetDefault(key, defaultValue)
 	}
-
-	cobra.OnInitialize(initConfig)
 }
 
 func checkRequiredFlags(flags *pflag.FlagSet) error {
