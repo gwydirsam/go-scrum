@@ -1,4 +1,4 @@
-package cmd
+package cli
 
 const (
 	dateInputFormat = "2006-01-02"
