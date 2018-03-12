@@ -16,8 +16,8 @@
 [[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
-  revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
-  version = "v1.5.0"
+  revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
+  version = "v1.6.0"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -32,8 +32,8 @@
     "internal",
     "signal"
   ]
-  revision = "57e77c5c37da1f4e1af49f9d1fe760f146c1579e"
-  version = "v0.3.2"
+  revision = "0e2aa5d22efec1603f7ded7097c500e9a36a13b3"
+  version = "v0.3.3"
 
 [[projects]]
   branch = "master"
@@ -68,7 +68,7 @@
     "errors",
     "storage"
   ]
-  revision = "72305f7ef3c379209f67e7a20367983a5e276c49"
+  revision = "52ff23883bd0122fa63d5f9a34b076b63330bca8"
 
 [[projects]]
   branch = "master"
@@ -79,8 +79,8 @@
 [[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
-  revision = "d419a98cdbed11a922bf76f257b7c4be79b50e73"
-  version = "v1.7.4"
+  revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
+  version = "v1.7.6"
 
 [[projects]]
   branch = "master"
@@ -116,7 +116,7 @@
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "a4e142e9c047c904fa2f1e144d9a84e6133024bc"
+  revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
 
 [[projects]]
   branch = "master"
@@ -134,7 +134,7 @@
   branch = "master"
   name = "github.com/pkg/errors"
   packages = ["."]
-  revision = "30136e27e2ac8d167177e8a583aa4c3fea5be833"
+  revision = "816c9085562cd7ee03e7f8188a1cfd942858cded"
 
 [[projects]]
   name = "github.com/rs/zerolog"
@@ -143,8 +143,8 @@
     "internal/json",
     "log"
   ]
-  revision = "b53826c57a6a1d8833443ebeacf1cfb62b229c64"
-  version = "v1.4.0"
+  revision = "56a970de510213e50dbaa39ad73ac07c9ec75606"
+  version = "v1.5.0"
 
 [[projects]]
   name = "github.com/ryanuber/columnize"
@@ -182,14 +182,14 @@
 [[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
-  revision = "acbeb36b902d72a7a4c18e8f3241075e7ab763e4"
-  version = "v1.1.0"
+  revision = "8965335b8c7107321228e3e3702cab9832751bac"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "be77323fc05148ef091e83b3866c0d47c8e74a8b"
+  revision = "c6c44e6fdcc30161c7f4480754da7230d01c06e3"
 
 [[projects]]
   branch = "master"
@@ -222,7 +222,7 @@
     "ssh/agent",
     "ssh/terminal"
   ]
-  revision = "9de5f2eaf759b4c4550b3db39fed2e9e5f86f45c"
+  revision = "c7dcf104e3a7a1417abc0230cb0d5240d764159d"
 
 [[projects]]
   branch = "master"
@@ -231,10 +231,9 @@
     "unix",
     "windows"
   ]
-  revision = "37707fdb30a5b38865cfb95e5aab41707daec7fd"
+  revision = "c28acc882ebcbfbe8ce9f0f14b9ac26ee138dd51"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/text"
   packages = [
     "internal/gen",
@@ -244,13 +243,14 @@
     "unicode/cldr",
     "unicode/norm"
   ]
-  revision = "4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1"
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "d670f9405373e636a5a2765eea47fac0c9bc91a4"
+  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
+  version = "v2.1.1"
 
 [solve-meta]
   analyzer-name = "dep"
