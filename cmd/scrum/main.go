@@ -30,7 +30,7 @@ func realMain() int {
 
 	if err := cli.Execute(); err != nil {
 		log.Error().Err(err).Msg("unable to run")
-		return 1
+		return sysexits.Software
 	}
 
 	return sysexits.OK
