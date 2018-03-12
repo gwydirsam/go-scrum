@@ -160,18 +160,6 @@ func init() {
 
 	{
 		const (
-			key               = configKeyScrumUsername
-			longOpt, shortOpt = "user", "u"
-			defaultValue      = "$USER"
-		)
-		flags := getCmd.Flags()
-		flags.StringP(longOpt, shortOpt, defaultValue, "Get scrum for specified user")
-		viper.BindPFlag(key, flags.Lookup(longOpt))
-		viper.SetDefault(key, defaultValue)
-	}
-
-	{
-		const (
 			key               = configKeyGetYesterday
 			longOpt, shortOpt = "yesterday", "y"
 			defaultValue      = false
@@ -308,7 +296,9 @@ var getCmd = &cobra.Command{
 		case viper.GetBool(configKeyGetAll):
 			return getAllScrum(w, client, scrumDate)
 		case !viper.GetBool(configKeyGetAll):
-			return getSingleScrum(w, client, scrumDate, getUser(configKeyScrumUsername), false)
+			username := viper.GetString(configKeyScrumUsername)
+			username = interpolateUserEnvVar(username)
+			return getSingleScrum(w, client, scrumDate, username, false)
 		default:
 			return errors.New("unsupported get mode")
 		}
