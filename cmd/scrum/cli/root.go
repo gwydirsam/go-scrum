@@ -309,6 +309,21 @@ func init() {
 
 	{
 		const (
+			key         = configKeyInputDate
+			longName    = "date"
+			shortName   = "D"
+			description = "Date for scrum"
+		)
+		defaultValue := time.Now().Format(dateInputFormat)
+
+		flags := rootCmd.PersistentFlags()
+		flags.StringP(longName, shortName, defaultValue, description)
+		viper.BindPFlag(key, flags.Lookup(longName))
+		viper.SetDefault(key, defaultValue)
+	}
+
+	{
+		const (
 			key               = configKeyScrumUsername
 			longOpt, shortOpt = "user", "u"
 			defaultValue      = "$USER"
